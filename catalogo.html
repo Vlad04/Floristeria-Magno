@@ -304,18 +304,25 @@
     }
 
     .logo-mark {
-      width: 46px;
-      height: 46px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background:
-        radial-gradient(circle at 36% 30%, #fff 0 12%, transparent 13%),
-        linear-gradient(135deg, var(--theme-accent), var(--theme-accent-2));
-      color: #fff;
-      box-shadow: 0 14px 28px color-mix(in srgb, var(--theme-accent) 28%, transparent);
+      overflow: hidden;
+      background: rgba(255,255,255,.65);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 12px 28px rgba(23,19,22,.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
     }
 
+    .logo-mark img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
     .nav-link {
       color: rgba(23, 19, 22, .72);
       font-weight: 650;
@@ -1175,8 +1182,10 @@
   <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2" href="index.html#inicio">
-        <span class="logo-mark"><i class="bi bi-flower1"></i></span>
-        <span>Floristería Juan H Magno</span>
+        <span class="logo-mark">
+          <img src="assets/img/icon/logo_lpb.png" alt="Logo Floristería Juan H Magno">
+        </span>
+        <span class="logo-text" style="font-size: 1.2rem;">Floristería Juan H Magno</span>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Abrir menú">
         <span class="navbar-toggler-icon"></span>
