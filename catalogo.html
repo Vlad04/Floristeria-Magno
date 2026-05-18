@@ -1641,6 +1641,7 @@
         event.preventDefault();
         showPageTransition();
         setTimeout(() => {
+          sessionStorage.setItem('floristeria_page_transition', 'true');
           window.location.href = href;
         }, 520);
       });

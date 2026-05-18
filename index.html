@@ -1911,6 +1911,7 @@
         event.preventDefault();
         showPageTransition();
         setTimeout(() => {
+          sessionStorage.setItem('floristeria_page_transition', 'true');
           window.location.href = href;
         }, 520);
       });
@@ -1922,25 +1923,28 @@
     // Después, la navegación usa una transición floral suave entre páginas.
     window.addEventListener('load', () => {
       const loader = document.getElementById('introLoader');
+
       if (!loader) {
         document.body.classList.remove('loading');
         return;
       }
 
-      const introAlreadySeen = sessionStorage.getItem('floralIntroSeen') === 'true';
+      const introAlreadySeen = localStorage.getItem('floristeria_intro_seen') === 'true';
+      const cameFromPageTransition = sessionStorage.getItem('floristeria_page_transition') === 'true';
 
-      if (introAlreadySeen) {
+      if (introAlreadySeen || cameFromPageTransition) {
         loader.classList.add('hide');
         document.body.classList.remove('loading');
+        sessionStorage.removeItem('floristeria_page_transition');
         return;
       }
 
-      sessionStorage.setItem('floralIntroSeen', 'true');
+      localStorage.setItem('floristeria_intro_seen', 'true');
 
       setTimeout(() => {
         loader.classList.add('hide');
         document.body.classList.remove('loading');
-      }, 1050);
+      }, 1400);
     });
 
     // Navbar blur/shadow on scroll
