@@ -1300,24 +1300,773 @@
       overflow: hidden;
     }
 
-  </style>
-</head>
-<body class="theme-spring">
-  <div class="page-transition" id="pageTransition" aria-hidden="true">
-    <div class="page-transition-inner">
-      <span class="page-transition-petal"></span>
-      <span class="page-transition-petal"></span>
-      <span class="page-transition-petal"></span>
-      <span class="page-transition-petal"></span>
-      <div>
-        <div class="transition-bloom" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><span></span><span></span>
-        </div>
-        <div class="transition-text">Preparando flores</div>
-      </div>
-    </div>
-  </div>
 
+/* =========================================================
+   OVERRIDE CATÁLOGO OSCURO / CINEMATOGRÁFICO
+   Mantiene la lógica del catálogo, filtros, carrito y temporadas.
+========================================================= */
+body.catalog-dark {
+  --flor-dark: #13070d;
+  --flor-wine: #3b111d;
+  --flor-rose: #d98ca4;
+  --flor-blush: #f8dbe4;
+  --flor-gold: #d6af65;
+  --flor-cream: #fff8ef;
+  --flor-green: #637a55;
+  --ink: #fff8ef;
+  --muted: rgba(255, 248, 239, .70);
+  --paper: #13070d;
+  --shadow: 0 34px 90px rgba(0, 0, 0, .34);
+  background: var(--flor-dark);
+  color: var(--flor-cream);
+}
+
+body.catalog-dark.theme-spring {
+  --theme-accent: #d98ca4;
+  --theme-accent-2: #d6af65;
+  --theme-bg: #13070d;
+  --theme-bg-2: #2d0d17;
+  --theme-card: rgba(255, 248, 239, .08);
+  --theme-soft: rgba(217, 140, 164, .18);
+  --theme-particle: #f8b3c4;
+  --theme-gradient:
+    radial-gradient(circle at 25% 25%, rgba(217, 140, 164, .18), transparent 32%),
+    radial-gradient(circle at 78% 38%, rgba(214, 175, 101, .12), transparent 30%),
+    linear-gradient(135deg, #14070d 0%, #2d0d17 48%, #090507 100%);
+}
+body.catalog-dark.theme-summer {
+  --theme-accent: #e3aa63;
+  --theme-accent-2: #d6af65;
+  --theme-bg: #130b07;
+  --theme-bg-2: #33210e;
+  --theme-card: rgba(255, 248, 239, .08);
+  --theme-soft: rgba(227, 170, 99, .18);
+  --theme-particle: #ffd37a;
+  --theme-gradient:
+    radial-gradient(circle at 24% 22%, rgba(255, 180, 92, .18), transparent 34%),
+    radial-gradient(circle at 80% 36%, rgba(255, 211, 122, .14), transparent 31%),
+    linear-gradient(135deg, #160b05 0%, #3b1e0a 52%, #090507 100%);
+}
+body.catalog-dark.theme-autumn {
+  --theme-accent: #c98268;
+  --theme-accent-2: #d6af65;
+  --theme-bg: #140907;
+  --theme-bg-2: #31140d;
+  --theme-card: rgba(255, 248, 239, .08);
+  --theme-soft: rgba(201, 130, 104, .18);
+  --theme-particle: #c98268;
+  --theme-gradient:
+    radial-gradient(circle at 24% 22%, rgba(201, 130, 104, .18), transparent 34%),
+    radial-gradient(circle at 80% 36%, rgba(183, 154, 108, .14), transparent 31%),
+    linear-gradient(135deg, #160806 0%, #35140c 52%, #090507 100%);
+}
+body.catalog-dark.theme-winter {
+  --theme-accent: #86a9b8;
+  --theme-accent-2: #d6af65;
+  --theme-bg: #071014;
+  --theme-bg-2: #102730;
+  --theme-card: rgba(255, 248, 239, .08);
+  --theme-soft: rgba(134, 169, 184, .18);
+  --theme-particle: #b9e3f2;
+  --theme-gradient:
+    radial-gradient(circle at 24% 22%, rgba(134, 169, 184, .22), transparent 34%),
+    radial-gradient(circle at 80% 36%, rgba(214, 175, 101, .10), transparent 31%),
+    linear-gradient(135deg, #061016 0%, #102b35 52%, #090507 100%);
+}
+
+body.catalog-dark .navbar {
+  background: linear-gradient(to bottom, rgba(19, 7, 13, .82), rgba(19, 7, 13, .28));
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  backdrop-filter: blur(18px);
+}
+body.catalog-dark .navbar.scrolled {
+  background: rgba(19, 7, 13, .88);
+  box-shadow: 0 18px 40px rgba(0,0,0,.22);
+}
+body.catalog-dark .navbar-brand,
+body.catalog-dark .nav-link {
+  color: rgba(255, 248, 239, .86);
+}
+body.catalog-dark .nav-link:hover,
+body.catalog-dark .nav-link.active {
+  color: var(--flor-blush);
+}
+body.catalog-dark .logo-mark {
+  background: rgba(255,255,255,.08);
+  box-shadow: 0 12px 32px rgba(0,0,0,.24);
+}
+
+body.catalog-dark .season-preview-panel {
+  background: rgba(19, 7, 13, .58);
+  border: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: 0 18px 45px rgba(0,0,0,.28);
+}
+body.catalog-dark .season-btn {
+  background: rgba(255, 255, 255, .07);
+  border-color: rgba(255,255,255,.12);
+  color: rgba(255, 248, 239, .82);
+}
+body.catalog-dark .season-btn:hover {
+  background: rgba(255,255,255,.14);
+}
+body.catalog-dark .season-btn.active {
+  color: #1a0b10;
+  background: linear-gradient(135deg, #fff3cf, var(--theme-accent-2));
+}
+
+.catalog-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 128px 0 76px;
+  overflow: hidden;
+  color: var(--flor-cream);
+  background: var(--theme-gradient);
+}
+.catalog-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(19, 7, 13, .22), rgba(19, 7, 13, .72)),
+    url('https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&w=1800&q=85');
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.12);
+  animation: catalogRevealGarden 3.2s ease forwards 1.2s;
+}
+.catalog-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 0%, rgba(19, 7, 13, .18) 38%, rgba(19, 7, 13, .90) 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+@keyframes catalogRevealGarden {
+  to { opacity: .48; transform: scale(1); }
+}
+.catalog-hero .container {
+  z-index: 10;
+}
+.catalog-hero .eyebrow {
+  color: var(--flor-gold);
+}
+.catalog-hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3.4rem, 8vw, 8.5rem);
+  line-height: .84;
+  letter-spacing: -.06em;
+  color: var(--flor-cream);
+  opacity: 0;
+  transform: translateY(28px);
+  animation: catalogSoftRise 1.2s cubic-bezier(.2,.75,.2,1) forwards 2.8s;
+}
+.catalog-hero .hero-copy,
+.catalog-hero p {
+  color: rgba(255, 248, 239, .78);
+  opacity: 0;
+  transform: translateY(22px);
+  animation: catalogSoftRise 1s ease forwards 3.15s;
+}
+.catalog-hero .btn-luxury {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: catalogSoftRise 1s ease forwards 3.4s;
+}
+@keyframes catalogSoftRise {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.catalog-ink-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  overflow: hidden;
+}
+.catalog-ink-blur {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--theme-accent) 38%, transparent), transparent 65%);
+  filter: blur(16px);
+  opacity: 0;
+  animation: catalogInkBloom 3s ease forwards;
+}
+.catalog-ink-blur.one { top: 18%; left: 8%; animation-delay: 1.6s; }
+.catalog-ink-blur.two {
+  right: 7%;
+  bottom: 12%;
+  background: radial-gradient(circle, rgba(214, 175, 101, .18), transparent 68%);
+  animation-delay: 2.2s;
+}
+@keyframes catalogInkBloom {
+  0% { transform: scale(.3); opacity: 0; }
+  55% { opacity: 1; }
+  100% { transform: scale(1.45); opacity: .55; }
+}
+
+.catalog-opening-flower {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  transform: translate(-50%, -50%) scale(.2);
+  z-index: 12;
+  opacity: 0;
+  animation: catalogFlowerAppear 2.25s ease forwards .2s, catalogFlowerExit 1.4s ease forwards 2.7s;
+  pointer-events: none;
+}
+.catalog-flower-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff2c3, var(--flor-gold));
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 34px rgba(214, 175, 101, .7);
+}
+.catalog-flower-petal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 82px;
+  border-radius: 70%;
+  background: radial-gradient(circle at 45% 28%, #fff5f8, var(--theme-accent) 42%, #8f3049 100%);
+  transform-origin: center 78px;
+  filter: drop-shadow(0 15px 22px rgba(0,0,0,.28));
+}
+.catalog-flower-petal:nth-child(1) { transform: translate(-50%, -88%) rotate(0deg); }
+.catalog-flower-petal:nth-child(2) { transform: translate(-50%, -88%) rotate(45deg); }
+.catalog-flower-petal:nth-child(3) { transform: translate(-50%, -88%) rotate(90deg); }
+.catalog-flower-petal:nth-child(4) { transform: translate(-50%, -88%) rotate(135deg); }
+.catalog-flower-petal:nth-child(5) { transform: translate(-50%, -88%) rotate(180deg); }
+.catalog-flower-petal:nth-child(6) { transform: translate(-50%, -88%) rotate(225deg); }
+.catalog-flower-petal:nth-child(7) { transform: translate(-50%, -88%) rotate(270deg); }
+.catalog-flower-petal:nth-child(8) { transform: translate(-50%, -88%) rotate(315deg); }
+@keyframes catalogFlowerAppear {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.2) rotate(-20deg); filter: blur(10px); }
+  60% { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+}
+@keyframes catalogFlowerExit {
+  to { opacity: 0; transform: translate(-50%, -64%) scale(1.25) rotate(18deg); filter: blur(8px); }
+}
+
+.catalog-branch {
+  position: absolute;
+  z-index: 7;
+  width: 260px;
+  height: 260px;
+  opacity: 0;
+  animation: catalogBranchDraw 1.8s ease forwards 3.1s;
+  pointer-events: none;
+}
+.catalog-branch.left { left: 3%; bottom: 9%; transform: rotate(-18deg); }
+.catalog-branch.right { right: 3%; top: 18%; transform: rotate(165deg); animation-delay: 3.35s; }
+.catalog-branch svg { width: 100%; height: 100%; overflow: visible; }
+.catalog-branch path {
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  animation: catalogDrawStroke 2.3s ease forwards 3.1s;
+}
+.catalog-branch.right path { animation-delay: 3.35s; }
+@keyframes catalogBranchDraw { to { opacity: .75; } }
+@keyframes catalogDrawStroke { to { stroke-dashoffset: 0; } }
+
+.catalog-mouse-light {
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--theme-accent) 22%, transparent), transparent 65%);
+  z-index: 5;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity .3s ease;
+  filter: blur(6px);
+}
+.catalog-hero:hover .catalog-mouse-light { opacity: 1; }
+
+.catalog-hero-visual {
+  position: relative;
+  min-height: 560px;
+  opacity: 0;
+  transform: translateY(26px);
+  animation: catalogSoftRise 1.2s ease forwards 3.25s;
+}
+.catalog-carousel-card {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 42px;
+  box-shadow: 0 34px 90px rgba(0,0,0,.34);
+  background: #fff;
+  isolation: isolate;
+}
+.catalog-carousel-main {
+  width: min(84%, 470px);
+  height: 560px;
+  right: 4%;
+  top: 0;
+}
+.catalog-carousel-main,
+.catalog-carousel-main .carousel-inner,
+.catalog-carousel-main .carousel-item { height: 560px; }
+.catalog-carousel-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.035);
+  transition: transform 1.4s ease, filter 1.4s ease;
+}
+.catalog-carousel-main:hover img { transform: scale(1.1); filter: saturate(1.05); }
+.catalog-carousel-main::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(23,19,22,0) 35%, rgba(23,19,22,.22));
+  z-index: 2;
+  pointer-events: none;
+}
+.catalog-small-photo {
+  width: 220px;
+  height: 285px;
+  left: 0;
+  bottom: 28px;
+  border: 10px solid rgba(255, 248, 239, .55);
+}
+.catalog-small-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.catalog-hero-label {
+  position: absolute;
+  right: 0;
+  bottom: 26px;
+  z-index: 4;
+  width: min(84%, 370px);
+  border-radius: 28px;
+  padding: 22px;
+  background: rgba(255, 248, 239, .10);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 22px 60px rgba(0,0,0,.28);
+  border: 1px solid rgba(255,255,255,.16);
+  color: var(--flor-cream);
+}
+.catalog-hero-label p {
+  animation: none;
+  opacity: 1;
+  transform: none;
+  color: rgba(255,248,239,.72);
+}
+.catalog-hero-label i { color: var(--flor-gold); }
+
+body.catalog-dark main,
+body.catalog-dark section.collection-section {
+  background:
+    radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--theme-accent) 14%, transparent), transparent 28%),
+    linear-gradient(180deg, #13070d 0%, #241019 55%, #13070d 100%);
+}
+body.catalog-dark .catalog-toolbar {
+  background: rgba(255, 248, 239, .08);
+  border: 1px solid rgba(255,255,255,.13);
+  box-shadow: 0 20px 50px rgba(0,0,0,.22);
+}
+body.catalog-dark .filter-chip {
+  color: rgba(255, 248, 239, .84);
+  background: rgba(255,255,255,.07);
+}
+body.catalog-dark .filter-chip.active,
+body.catalog-dark .filter-chip:hover {
+  color: #1a0b10;
+  background: linear-gradient(135deg, #fff3cf, var(--flor-gold));
+}
+
+body.catalog-dark .product-card,
+body.catalog-dark .cart-card,
+body.catalog-dark .modal-content {
+  background: rgba(255, 248, 239, .08);
+  border: 1px solid rgba(255,255,255,.13);
+  box-shadow: 0 30px 80px rgba(0,0,0,.26);
+  color: var(--flor-cream);
+}
+body.catalog-dark .product-card:hover {
+  background: rgba(255, 248, 239, .12);
+}
+body.catalog-dark .product-badge {
+  color: #1a0b10;
+  background: rgba(255, 248, 239, .82);
+}
+body.catalog-dark .price,
+body.catalog-dark .eyebrow {
+  color: var(--flor-gold);
+}
+body.catalog-dark .text-muted-custom,
+body.catalog-dark .hero-copy {
+  color: rgba(255,248,239,.68);
+}
+body.catalog-dark .product-card h3,
+body.catalog-dark .cart-card h4,
+body.catalog-dark .modal-content h2,
+body.catalog-dark footer h4 {
+  color: var(--flor-cream);
+}
+body.catalog-dark .modal-content {
+  backdrop-filter: blur(22px);
+}
+body.catalog-dark .btn-close {
+  filter: invert(1);
+}
+body.catalog-dark .calendar-day,
+body.catalog-dark .delivery-slot,
+body.catalog-dark .qty-btn {
+  background: rgba(255,255,255,.08);
+  color: var(--flor-cream);
+  border: 1px solid rgba(255,255,255,.12);
+}
+body.catalog-dark .calendar-day.active,
+body.catalog-dark .calendar-day:hover,
+body.catalog-dark .delivery-slot.active,
+body.catalog-dark .delivery-slot:hover {
+  background: var(--theme-accent);
+  color: #fff;
+}
+body.catalog-dark footer {
+  background: #090507;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+body.catalog-dark .cart-line {
+  border-bottom-color: rgba(255,255,255,.10);
+}
+
+@media (max-width: 991px) {
+  .catalog-hero { padding-top: 118px; }
+  .catalog-hero-visual { min-height: 500px; margin-top: 30px; }
+  .catalog-carousel-main { right: 0; width: 84%; height: 480px; }
+  .catalog-carousel-main,
+  .catalog-carousel-main .carousel-inner,
+  .catalog-carousel-main .carousel-item { height: 480px; }
+  .catalog-small-photo { width: 190px; height: 240px; }
+}
+@media (max-width: 575px) {
+  .catalog-hero h1 { font-size: 4.1rem; }
+  .catalog-opening-flower { width: 120px; height: 120px; }
+  .catalog-flower-petal { width: 39px; height: 68px; transform-origin: center 64px; }
+  .catalog-hero-visual { min-height: 430px; }
+  .catalog-carousel-main { width: 92%; height: 405px; border-radius: 32px; }
+  .catalog-carousel-main,
+  .catalog-carousel-main .carousel-inner,
+  .catalog-carousel-main .carousel-item { height: 405px; }
+  .catalog-small-photo { width: 145px; height: 190px; bottom: 2px; }
+  .catalog-hero-label { width: 88%; left: 6%; right: auto; bottom: 18px; }
+}
+
+  
+body.catalog-dark .btn-soft {
+  color: var(--flor-cream);
+  border-color: rgba(255,255,255,.18);
+  background: rgba(255,255,255,.07);
+}
+body.catalog-dark .btn-soft:hover {
+  color: var(--flor-cream);
+  background: rgba(255,255,255,.14);
+}
+
+
+/* =========================================================
+   AJUSTES FINALES SOLICITADOS
+   - Catálogo con texto "Flores que no solo se ven, se sienten"
+   - Sin animación abrupta al entrar: solo fade suave del hero
+   - Opción Inicio visible en navegación
+========================================================= */
+body.catalog-dark .catalog-hero::before {
+  opacity: .48;
+  transform: scale(1.035);
+  animation: catalogBgSoftIn 1.15s ease forwards;
+}
+
+@keyframes catalogBgSoftIn {
+  to {
+    opacity: .52;
+    transform: scale(1);
+  }
+}
+
+body.catalog-dark .catalog-opening-flower {
+  display: none !important;
+}
+
+body.catalog-dark .catalog-hero h1 {
+  animation-delay: .28s !important;
+}
+
+body.catalog-dark .catalog-hero .hero-copy,
+body.catalog-dark .catalog-hero p {
+  animation-delay: .48s !important;
+}
+
+body.catalog-dark .catalog-hero .btn-luxury,
+body.catalog-dark .catalog-hero .btn-soft {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: catalogSoftRise .9s ease forwards .68s !important;
+}
+
+body.catalog-dark .catalog-hero-visual {
+  animation-delay: .82s !important;
+}
+
+body.catalog-dark .catalog-ink-blur.one {
+  animation-delay: .25s !important;
+}
+
+body.catalog-dark .catalog-ink-blur.two {
+  animation-delay: .45s !important;
+}
+
+body.catalog-dark .catalog-branch,
+body.catalog-dark .catalog-branch path,
+body.catalog-dark .catalog-branch.right,
+body.catalog-dark .catalog-branch.right path {
+  animation-delay: .7s !important;
+}
+
+.catalog-gold-script {
+  display: inline-block;
+  color: transparent;
+  background: linear-gradient(100deg, #fff6dc, var(--flor-gold), var(--theme-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  position: relative;
+}
+
+.catalog-gold-script::after {
+  content: '';
+  position: absolute;
+  left: 6%;
+  bottom: -10px;
+  width: 88%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(214,175,101,.82), transparent);
+}
+
+body.catalog-dark .navbar .nav-link[href="index.html#inicio"] {
+  display: inline-block;
+}
+
+/* =========================================================
+   HERO CATÁLOGO IGUAL AL HOME
+========================================================= */
+
+.catalog-hero-home-style {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 0 70px;
+}
+
+.catalog-hero-home-style .catalog-hero-content {
+  position: relative;
+  z-index: 10;
+  max-width: 1040px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 80px 22px 40px;
+}
+
+.catalog-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 17px;
+  border-radius: 999px;
+  color: rgba(255, 248, 239, 0.86);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(16px);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(18px);
+  animation: catalogSoftRise 1s ease forwards .35s;
+}
+
+.catalog-hero-badge i {
+  color: var(--flor-gold);
+}
+
+.catalog-hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(4.2rem, 9vw, 9.8rem) !important;
+  line-height: .78 !important;
+  letter-spacing: -.065em;
+  margin: 34px auto 26px;
+  max-width: 1060px;
+  color: var(--flor-cream);
+  opacity: 0;
+  transform: translateY(32px);
+  animation: catalogTitleReveal 1.25s cubic-bezier(.2,.75,.2,1) forwards .65s !important;
+}
+
+.catalog-hero-title span {
+  display: block;
+  color: transparent;
+  background: linear-gradient(100deg, #fff6dc, var(--flor-gold), var(--theme-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  position: relative;
+}
+
+.catalog-hero-title span::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  bottom: -12px;
+  width: 84%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(214,175,101,.85), transparent);
+  transform: scaleX(0);
+  animation: catalogGoldenLine 1.15s ease forwards 1.55s;
+}
+
+.catalog-hero-description {
+  max-width: 760px;
+  margin: 0 auto;
+  color: rgba(255, 248, 239, 0.78);
+  font-size: clamp(1rem, 2vw, 1.22rem);
+  line-height: 1.8;
+  opacity: 0;
+  transform: translateY(22px);
+  animation: catalogSoftRise 1s ease forwards 1.15s !important;
+}
+
+.catalog-hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 36px;
+  flex-wrap: wrap;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: catalogSoftRise 1s ease forwards 1.35s;
+}
+
+.catalog-stat-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 48px auto 0;
+  max-width: 820px;
+  opacity: 0;
+  transform: translateY(22px);
+  animation: catalogSoftRise 1s ease forwards 1.6s;
+}
+
+.catalog-stat-item {
+  border-radius: 24px;
+  padding: 18px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(12px);
+}
+
+.catalog-stat-item strong {
+  display: block;
+  color: var(--flor-cream);
+  font-size: 1.35rem;
+  font-weight: 850;
+}
+
+.catalog-stat-item span {
+  color: rgba(255,248,239,.70);
+  font-size: .84rem;
+}
+
+.catalog-scroll-indicator {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  z-index: 15;
+  transform: translateX(-50%);
+  color: rgba(255, 248, 239, 0.68);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: catalogSoftRise 1s ease forwards 1.85s;
+}
+
+.catalog-scroll-indicator::after {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 46px;
+  margin: 12px auto 0;
+  background: linear-gradient(var(--flor-gold), transparent);
+  animation: catalogScrollLine 1.6s ease-in-out infinite;
+}
+
+@keyframes catalogTitleReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes catalogGoldenLine {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes catalogScrollLine {
+  0%, 100% {
+    transform: scaleY(.45);
+    opacity: .45;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 991px) {
+  .catalog-stat-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 575px) {
+  .catalog-hero-title {
+    font-size: 4.2rem !important;
+  }
+
+  .catalog-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .catalog-hero-actions .btn {
+    width: 100%;
+  }
+}
+
+</style>
+</head>
+<body class="theme-spring catalog-dark">
   <div class="season-particles" id="seasonParticles" aria-hidden="true"></div>
 
   <div class="season-preview-panel" id="seasonPreviewPanel" aria-label="Previsualizar tema de temporada">
@@ -1340,6 +2089,7 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+          <li class="nav-item"><a class="nav-link" href="index.html#inicio">Inicio</a></li>
           <li class="nav-item"><a class="nav-link" href="index.html#momentos">Momentos</a></li>
           <li class="nav-item"><a class="nav-link" href="index.html#servicios">Servicios</a></li>
           <li class="nav-item"><a class="nav-link active" href="catalogo.html">Catálogo</a></li>
@@ -1351,23 +2101,81 @@
     </div>
   </nav>
 
-  <header class="catalog-hero">
-    <div class="container position-relative">
-      <div class="row align-items-end g-4">
-        <div class="col-lg-8 reveal visible">
-          <div class="eyebrow mb-3">Catálogo floral</div>
-          <h1 class="serif mb-3">Elige tu arreglo y agenda tu entrega.</h1>
-          <p class="hero-copy mb-0">Agrega productos al carrito, selecciona fecha y horario de entrega, y confirma tu pedido por WhatsApp.</p>
+  <header class="catalog-hero catalog-hero-home-style" id="catalogo">
+  <div class="catalog-mouse-light" id="catalogMouseLight"></div>
+
+  <div class="catalog-ink-layer">
+    <div class="catalog-ink-blur one"></div>
+    <div class="catalog-ink-blur two"></div>
+  </div>
+
+  <div class="catalog-branch left" aria-hidden="true">
+    <svg viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M26 235C76 176 102 133 130 58" stroke="rgba(248,219,228,.62)" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M72 180C56 169 43 158 31 138" stroke="rgba(214,175,101,.42)" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M98 136C124 126 139 111 151 84" stroke="rgba(214,175,101,.38)" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="catalog-branch right" aria-hidden="true">
+    <svg viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M26 235C76 176 102 133 130 58" stroke="rgba(248,219,228,.48)" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M72 180C56 169 43 158 31 138" stroke="rgba(214,175,101,.36)" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M98 136C124 126 139 111 151 84" stroke="rgba(214,175,101,.34)" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="container">
+    <div class="catalog-hero-content">
+      <div class="catalog-hero-badge">
+        <i class="bi bi-flower1"></i>
+        Arte floral contemporáneo en Guadalajara
+      </div>
+
+      <h1 class="catalog-hero-title">
+        Flores que no solo<br>
+        se ven,
+        <span>se sienten.</span>
+      </h1>
+
+      <p class="catalog-hero-description">
+        Diseñamos arreglos florales con estética, intención y emoción. Ramos,
+        regalos, eventos y detalles personalizados para convertir cualquier
+        momento en una escena inolvidable.
+      </p>
+
+      <div class="catalog-hero-actions">
+        <a href="#productos" class="btn btn-luxury">
+          Explorar catálogo
+        </a>
+
+        <button class="btn btn-soft" data-bs-toggle="modal" data-bs-target="#cartModal">
+          Ver carrito
+        </button>
+      </div>
+
+      <div class="catalog-stat-strip">
+        <div class="catalog-stat-item">
+          <strong>Desde 2011</strong>
+          <span>creando recuerdos florales</span>
         </div>
-        <div class="col-lg-4 text-lg-end reveal visible">
-          <button class="btn btn-luxury" data-bs-toggle="modal" data-bs-target="#cartModal"><i class="bi bi-bag-heart me-2"></i> Ver carrito</button>
+        <div class="catalog-stat-item">
+          <strong>3 horarios</strong>
+          <span>entrega programada diaria</span>
+        </div>
+        <div class="catalog-stat-item">
+          <strong>Zapopan</strong>
+          <span>con entrega y diseño personalizado</span>
         </div>
       </div>
     </div>
-  </header>
+  </div>
+
+  <div class="catalog-scroll-indicator">Explorar</div>
+</header>
 
   <main>
-    <section class="section-padding collection-section pt-5">
+    <section class="section-padding collection-section pt-5" id="productos">
       <div class="container">
         <div class="catalog-toolbar mb-5 reveal visible" id="catalogToolbar">
           <button class="filter-chip active" data-filter="all">Todos</button>
@@ -1592,66 +2400,20 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
 
-    // Transición suave entre páginas internas
-    const pageTransition = document.getElementById('pageTransition');
-
-    function showPageTransition() {
-      if (!pageTransition) return;
-      document.body.classList.add('is-transitioning');
-      pageTransition.classList.add('is-active');
-    }
-
-    function hidePageTransition(delay = 420) {
-      if (!pageTransition) return;
-      setTimeout(() => {
-        pageTransition.classList.remove('is-active');
-        document.body.classList.remove('is-transitioning');
-      }, delay);
-    }
-
-    window.addEventListener('pageshow', () => {
-      hidePageTransition(360);
-    });
-
-    document.querySelectorAll('a[href]').forEach((link) => {
-      const href = link.getAttribute('href') || '';
-      const target = link.getAttribute('target');
-
-      const shouldSkip =
-        target === '_blank' ||
-        href.startsWith('#') ||
-        href.startsWith('mailto:') ||
-        href.startsWith('tel:') ||
-        href.startsWith('https://wa.me') ||
-        href.startsWith('http://wa.me') ||
-        href.startsWith('javascript:');
-
-      if (shouldSkip) return;
-
-      const isInternalHtml =
-        href.includes('index.html') ||
-        href.includes('catalogo.html') ||
-        href.endsWith('.html') ||
-        href.startsWith('./');
-
-      if (!isInternalHtml) return;
-
-      link.addEventListener('click', (event) => {
-        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-        event.preventDefault();
-        showPageTransition();
-        setTimeout(() => {
-          sessionStorage.setItem('floristeria_page_transition', 'true');
-          window.location.href = href;
-        }, 520);
-      });
-    });
-
-    hidePageTransition(520);
-
     const navbar = document.getElementById('mainNavbar');
     const handleNavbar = () => navbar.classList.toggle('scrolled', window.scrollY > 30);
     window.addEventListener('scroll', handleNavbar); handleNavbar();
+
+    const catalogHero = document.querySelector('.catalog-hero');
+    const catalogMouseLight = document.getElementById('catalogMouseLight');
+    if (catalogHero && catalogMouseLight) {
+      catalogHero.addEventListener('mousemove', (event) => {
+        const rect = catalogHero.getBoundingClientRect();
+        catalogMouseLight.style.left = `${event.clientX - rect.left}px`;
+        catalogMouseLight.style.top = `${event.clientY - rect.top}px`;
+      });
+    }
+
 
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); } });
@@ -1730,36 +2492,47 @@
       const items = Object.values(cart).filter(item => item.qty > 0);
       const count = items.reduce((sum, item) => sum + item.qty, 0);
       const total = items.reduce((sum, item) => sum + item.qty * item.price, 0);
-      cartCount.textContent = count; cartTotal.textContent = money(total);
+      cartCount.textContent = count;
+      cartTotal.textContent = money(total);
       cartItems.innerHTML = items.length ? items.map(item => `
-        <div class="cart-line"><div><strong>${item.name}</strong><div class="text-muted-custom small">${money(item.price)} c/u</div></div><div class="d-flex align-items-center gap-2"><button class="qty-btn" data-action="minus" data-id="${item.id}">−</button><strong>${item.qty}</strong><button class="qty-btn" data-action="plus" data-id="${item.id}">+</button></div></div>
-      `).join('') : '<p class="text-muted-custom mb-0">Tu carrito está vacío.</p>';
-      updateCheckoutLink();
+        <div class="cart-line">
+          <div><strong>${item.name}</strong><br><small class="text-muted-custom">${money(item.price)} c/u</small></div>
+          <div class="d-flex align-items-center gap-2">
+            <button class="qty-btn" onclick="changeQty('${item.id}', -1)">−</button>
+            <strong>${item.qty}</strong>
+            <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
+          </div>
+        </div>`).join('') : '<p class="text-muted-custom mb-0">Tu carrito está vacío.</p>';
+      updateWhatsapp();
     }
-    cartItems.addEventListener('click', (event) => {
-      const btn = event.target.closest('.qty-btn'); if (!btn) return;
-      const item = cart[btn.dataset.id]; if (!item) return;
-      if (btn.dataset.action === 'plus') item.qty += 1;
-      if (btn.dataset.action === 'minus') item.qty = Math.max(0, item.qty - 1);
-      renderCart();
-    });
+    window.changeQty = function(id, delta) { if (!cart[id]) return; cart[id].qty = Math.max(0, cart[id].qty + delta); renderCart(); };
     function renderCalendar() {
-      const calendar = document.getElementById('calendarPreview'); const today = new Date(); calendar.innerHTML = '';
+      const container = document.getElementById('calendarPreview');
+      const today = new Date();
+      container.innerHTML = '';
       for (let i = 0; i < 14; i++) {
         const date = new Date(today); date.setDate(today.getDate() + i);
-        const day = document.createElement('button'); day.type = 'button'; day.className = 'calendar-day';
-        day.textContent = date.getDate(); day.dataset.date = date.toISOString().slice(0, 10);
-        day.title = date.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
-        if (i === 0) { day.classList.add('active'); selectedDate = day.dataset.date; }
-        day.addEventListener('click', () => { document.querySelectorAll('.calendar-day').forEach(item => item.classList.remove('active')); day.classList.add('active'); selectedDate = day.dataset.date; updateCheckoutLink(); });
-        calendar.appendChild(day);
+        const btn = document.createElement('button');
+        btn.type = 'button'; btn.className = 'calendar-day';
+        btn.textContent = date.getDate();
+        const label = date.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' });
+        btn.title = label;
+        btn.dataset.date = label;
+        if (i === 0) { btn.classList.add('active'); selectedDate = label; }
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('active'));
+          btn.classList.add('active'); selectedDate = btn.dataset.date; updateWhatsapp();
+        });
+        container.appendChild(btn);
       }
     }
-    document.querySelectorAll('#deliverySlots .delivery-slot').forEach(slot => slot.addEventListener('click', () => {
-      document.querySelectorAll('#deliverySlots .delivery-slot').forEach(item => item.classList.remove('active'));
-      slot.classList.add('active'); selectedSlot = slot.dataset.slot; updateCheckoutLink();
-    }));
-    function updateCheckoutLink() {
+    document.querySelectorAll('.delivery-slot').forEach(slot => {
+      slot.addEventListener('click', () => {
+        document.querySelectorAll('.delivery-slot').forEach(s => s.classList.remove('active'));
+        slot.classList.add('active'); selectedSlot = slot.dataset.slot; updateWhatsapp();
+      });
+    });
+    function updateWhatsapp() {
       const items = Object.values(cart).filter(item => item.qty > 0);
       const total = items.reduce((sum, item) => sum + item.qty * item.price, 0);
       const detail = items.length ? items.map(item => `${item.qty} x ${item.name}`).join(', ') : 'sin productos todavía';
