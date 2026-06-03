@@ -549,8 +549,8 @@
       }
       .home-title {
       max-width: 620px;
-      font-size: clamp(4.2rem, 8.6vw, 8.8rem);
-      line-height: .80;
+      font-size: clamp(3.8rem, 7.8vw, 8rem);
+      line-height: .84;
       animation-delay: 3.05s;
       }
       .home-description {
@@ -1062,7 +1062,7 @@
       }
       .insta-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 14px;
       }
       .insta-grid img {
@@ -1071,6 +1071,141 @@
       object-fit: cover;
       border-radius: 28px;
       box-shadow: 0 18px 45px rgba(23,19,22,.08);
+      }
+
+      .floral-carousel-wrap {
+      position: relative;
+      width: min(100%, 1480px);
+      margin: 0 auto;
+      overflow: hidden;
+      padding: 12px 0 28px;
+      }
+
+      .floral-carousel-wrap::before,
+      .floral-carousel-wrap::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 120px;
+      z-index: 3;
+      pointer-events: none;
+      }
+
+      .floral-carousel-wrap::before {
+      left: 0;
+      background: linear-gradient(90deg, #fff8ef, rgba(255,248,239,0));
+      }
+
+      .floral-carousel-wrap::after {
+      right: 0;
+      background: linear-gradient(270deg, #fff8ef, rgba(255,248,239,0));
+      }
+
+      .floral-carousel {
+      display: flex;
+      gap: 22px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      padding: 4px max(24px, calc((100vw - 1320px) / 2 + 24px)) 20px;
+      cursor: grab;
+      user-select: none;
+      -webkit-overflow-scrolling: touch;
+      }
+
+      .floral-carousel.dragging {
+      cursor: grabbing;
+      scroll-snap-type: none;
+      scroll-behavior: auto;
+      }
+
+      .floral-carousel::-webkit-scrollbar {
+      height: 8px;
+      }
+
+      .floral-carousel::-webkit-scrollbar-track {
+      background: rgba(59,17,29,.06);
+      border-radius: 999px;
+      }
+
+      .floral-carousel::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg, var(--season-accent), var(--season-accent-2));
+      border-radius: 999px;
+      }
+
+      .floral-slide {
+      flex: 0 0 clamp(245px, 24vw, 360px);
+      height: clamp(310px, 34vw, 455px);
+      border-radius: 36px;
+      overflow: hidden;
+      position: relative;
+      scroll-snap-align: center;
+      box-shadow: 0 28px 70px rgba(59, 17, 29, 0.14);
+      background: #fff;
+      transform: translateZ(0);
+      transition: transform .55s ease, box-shadow .55s ease, filter .55s ease;
+      }
+
+      .floral-slide:nth-child(even) {
+      margin-top: 34px;
+      }
+
+      .floral-slide:hover {
+      transform: translateY(-10px) scale(1.015);
+      box-shadow: 0 38px 90px rgba(59, 17, 29, 0.22);
+      }
+
+      .floral-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+      transform: scale(1.04);
+      transition: transform 1.2s ease, filter 1.2s ease;
+      }
+
+      .floral-slide:hover img {
+      transform: scale(1.12);
+      filter: saturate(1.08) contrast(1.02);
+      }
+
+      .floral-slide::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(19,7,13,0) 46%, rgba(19,7,13,.34));
+      opacity: .82;
+      pointer-events: none;
+      }
+
+      .floral-slide span {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      z-index: 2;
+      color: var(--flor-cream);
+      font-size: .78rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      font-weight: 900;
+      text-shadow: 0 10px 24px rgba(0,0,0,.30);
+      }
+
+      .carousel-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      color: rgba(39,21,27,.58);
+      font-weight: 750;
+      font-size: .9rem;
+      }
+
+      .carousel-hint i {
+      color: var(--season-accent-2);
       }
       .map-card {
       min-height: 390px;
@@ -1271,6 +1406,73 @@
       margin: 0 auto 34px;
       color: rgba(255, 248, 239, 0.78);
       line-height: 1.8;
+      }
+
+      .unique-note-card {
+      border-radius: 30px;
+      padding: 24px;
+      background: rgba(255, 255, 255, .82);
+      border: 1px solid rgba(59, 17, 29, .08);
+      box-shadow: 0 22px 60px rgba(59, 17, 29, .10);
+      height: 100%;
+      }
+      .unique-note-card i {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--season-accent) 14%, white 86%);
+      color: var(--season-accent);
+      font-size: 1.45rem;
+      margin-bottom: 18px;
+      }
+      .social-links-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      }
+      .social-link-card {
+      border-radius: 26px;
+      padding: 22px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(59,17,29,.08);
+      color: #27151b;
+      font-weight: 850;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: .28s ease;
+      box-shadow: 0 18px 45px rgba(59,17,29,.08);
+      }
+      .social-link-card i {
+      font-size: 1.5rem;
+      color: var(--season-accent);
+      }
+      .social-link-card:hover {
+      transform: translateY(-4px);
+      color: #27151b;
+      box-shadow: 0 28px 70px rgba(59,17,29,.14);
+      }
+      .hours-list {
+      display: grid;
+      gap: 12px;
+      }
+      .hours-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(39,21,27,.08);
+      color: rgba(39,21,27,.72);
+      }
+      .hours-line strong {
+      color: #27151b;
+      }
+      @media (max-width: 575px) {
+      .social-links-grid {
+      grid-template-columns: 1fr;
+      }
       }
       footer {
       background: #13070d;
@@ -1710,7 +1912,7 @@
           bottom: 14px;
           z-index: 3000;
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(5, 1fr);
           gap: 6px;
           padding: 10px;
           border-radius: 28px;
@@ -1898,8 +2100,9 @@
           <a href="#servicios" class="nav-link-custom">Servicios</a>
           <a href="catalogo.html" class="nav-link-custom">Catálogo</a>
           <a href="ideas.html" class="nav-link-custom">Ideas</a>
-          <a href="#historias" class="nav-link-custom">Historias</a>
-          <a href="#temporadas" class="nav-link-custom">Temporada</a>
+          <a href="#novias" class="nav-link-custom">Novias</a>
+          <a href="rastreo.html" class="nav-link-custom">Rastrea tu pedido</a>
+          <a href="#nosotros" class="nav-link-custom">Quiénes somos</a>
           <a href="#contacto" class="btn-reservar">
           Ordenar flores
           </a>
@@ -1921,6 +2124,11 @@
       <a href="carrito.html">
         <i class="bi bi-basket"></i>
         <span>Carrito</span>
+      </a>
+
+      <a href="rastreo.html">
+        <i class="bi bi-truck"></i>
+        <span>Rastrear</span>
       </a>
       
       <a href="ideas.html">
@@ -1979,7 +2187,7 @@
               <a href="catalogo.html" class="btn-main page-link-transition">
               <i class="bi bi-bag-heart me-2"></i> Ver arreglos
               </a>
-              <a href="#experiencia" class="btn-secondary-hero">Crear mi ramo ideal</a>
+              <a href="#experiencia" class="btn-secondary-hero">Detalles importantes</a>
             </div>
           </div>
           <div class="col-lg-6">
@@ -2340,50 +2548,186 @@
           </div>
         </div>
       </section>
-      <!-- EXPERIENCIA -->
+      <!-- PIEZAS ÚNICAS / EXPECTATIVAS DEL PRODUCTO -->
       <section class="section-padding" id="experiencia">
         <div class="container">
           <div class="experience reveal">
             <div class="row align-items-center g-5">
               <div class="col-lg-6 position-relative" style="z-index:2;">
-                <div class="eyebrow mb-3">Experiencia interactiva</div>
-                <h2 class="section-title mb-4" style="color:#fff;">Diseña tu ramo ideal.</h2>
+                <div class="eyebrow mb-3">Cada arreglo es especial</div>
+                <h2 class="section-title mb-4" style="color:#fff;">Tu ramo será único, como el momento que quieres regalar.</h2>
                 <p class="mb-4" style="color:rgba(255,255,255,.78); max-width:620px; line-height:1.8;">
-                  Una pequeña guía para que el cliente no tenga que saber de flores: solo elige la emoción, colores y presupuesto aproximado.
+                  Las fotografías son una referencia de estilo, color y tamaño aproximado. Cada diseño floral se realiza de forma artesanal y puede variar según la disponibilidad de flores, temporada y producto final.
+                </p>
+                <p class="mb-0" style="color:rgba(255,255,255,.72); max-width:620px; line-height:1.8;">
+                  Ningún ramo es idéntico a otro: cada pieza se crea con cuidado, buen gusto y la intención de transmitir algo especial.
                 </p>
               </div>
               <div class="col-lg-6">
                 <div class="quiz-card">
-                  <h3 class="mb-3">¿Qué quieres transmitir?</h3>
-                  <div class="d-flex flex-wrap gap-2 mb-4" id="moodChips">
-                    <span class="chip active" data-suggestion="Ramo romántico con rosas suaves, follaje elegante y empaque premium.">Amor</span>
-                    <span class="chip" data-suggestion="Arreglo luminoso con girasoles o tonos cálidos para celebrar.">Alegría</span>
-                    <span class="chip" data-suggestion="Bouquet delicado en tonos blancos y pastel para agradecer con elegancia.">Gratitud</span>
-                    <span class="chip" data-suggestion="Diseño sobrio con lirios, blancos y detalles dorados para una ocasión especial.">Elegancia</span>
+                  <h3 class="mb-3">Importante antes de ordenar</h3>
+                  <div class="suggestion-box mb-3">
+                    <div class="eyebrow mb-2">Disponibilidad</div>
+                    <p class="mb-0 text-muted-custom">
+                      Algunos tonos, flores o follajes pueden cambiar de acuerdo con la temporada y disponibilidad del día.
+                    </p>
                   </div>
-                  <div class="suggestion-box">
-                    <div class="eyebrow mb-2">Sugerencia</div>
-                    <p class="mb-0 text-muted-custom" id="quizSuggestion">Ramo romántico con rosas suaves, follaje elegante y empaque premium.</p>
+                  <div class="suggestion-box mb-4">
+                    <div class="eyebrow mb-2">Diseño final</div>
+                    <p class="mb-0 text-muted-custom">
+                      Respetamos la esencia del arreglo elegido, pero el resultado final puede tener variaciones naturales. Eso hace que cada ramo sea único y especial.
+                    </p>
                   </div>
-                  <a href="https://wa.me/520000000000" class="btn-main mt-4 d-inline-flex">Pedir asesoría</a>
+                  <a href="https://wa.me/520000000000" class="btn-main mt-2 d-inline-flex">
+                    Confirmar disponibilidad
+                  </a>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-      <!-- SOCIAL -->
+
+      <!-- RAMOS DE NOVIA -->
+      <section class="section-padding soft-section" id="novias">
+        <div class="container">
+          <div class="row align-items-end mb-5 reveal">
+            <div class="col-lg-7">
+              <div class="eyebrow mb-2">Ramos de novia</div>
+              <h2 class="section-title mb-0">Diseños florales para un día inolvidable.</h2>
+            </div>
+            <div class="col-lg-5 mt-4 mt-lg-0">
+              <p class="text-muted-custom mb-0">
+                Creamos ramos de novia personalizados, elegantes y especiales para ceremonia, sesión de fotos, entrega simbólica o complemento del evento.
+              </p>
+            </div>
+          </div>
+          <div class="row g-4">
+            <div class="col-md-4 reveal">
+              <article class="flower-card">
+                <img src="https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=900&q=85" alt="Ramo de novia clásico">
+                <div class="flower-card-body">
+                  <h3>Novia clásico</h3>
+                  <p class="text-muted-custom mb-0">Tonos blancos, crema y follaje delicado para un estilo elegante y atemporal.</p>
+                </div>
+              </article>
+            </div>
+            <div class="col-md-4 reveal">
+              <article class="flower-card">
+                <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=900&q=85" alt="Ramo de novia romántico">
+                <div class="flower-card-body">
+                  <h3>Novia romántico</h3>
+                  <p class="text-muted-custom mb-0">Flores suaves, movimiento natural y detalles pensados para fotografía.</p>
+                </div>
+              </article>
+            </div>
+            <div class="col-md-4 reveal">
+              <article class="flower-card">
+                <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=900&q=85" alt="Decoración floral para boda">
+                <div class="flower-card-body">
+                  <h3>Boda y evento</h3>
+                  <p class="text-muted-custom mb-0">Complementos florales para mesa, ceremonia, sesión y ambientación especial.</p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUIÉNES SOMOS -->
+      <section class="section-padding" id="nosotros">
+        <div class="container">
+          <div class="row align-items-center g-5">
+            <div class="col-lg-6 reveal">
+              <div class="eyebrow mb-2">Quiénes somos</div>
+              <h2 class="section-title mb-4">Arte floral con intención.</h2>
+              <p class="text-muted-custom">
+                En Juan H Magno diseñamos arreglos florales únicos para regalar emociones, celebrar momentos y acompañar historias especiales.
+              </p>
+              <p class="text-muted-custom mb-0">
+                Nuestro trabajo combina estética, selección floral y atención personalizada para que cada composición tenga identidad propia.
+              </p>
+            </div>
+            <div class="col-lg-6 reveal">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="unique-note-card">
+                    <i class="bi bi-flower1"></i>
+                    <h4>Hecho a mano</h4>
+                    <p class="text-muted-custom mb-0">Cada ramo se arma con cuidado, intención y sensibilidad visual.</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="unique-note-card">
+                    <i class="bi bi-heart"></i>
+                    <h4>Diseño único</h4>
+                    <p class="text-muted-custom mb-0">No hacemos piezas idénticas: respetamos la esencia, pero cada arreglo es especial.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SOCIAL / CARRUSEL INSPIRACIÓN -->
       <section class="section-padding soft-section" id="social">
         <div class="container">
-          <div class="text-center mb-5 reveal">
+          <div class="text-center mb-4 reveal">
             <div class="eyebrow">Inspiración floral</div>
             <h2 class="section-title">Detalles que se ven bien en persona y en foto.</h2>
+            <p class="text-muted-custom mx-auto mt-3" style="max-width:760px;">
+              Una galería continua de estilos, texturas y colores para inspirar cada entrega. Arrastra con el mouse o desliza para explorar más ideas.
+            </p>
+            <div class="carousel-hint justify-content-center">
+              <i class="bi bi-arrow-left-right"></i>
+              Mantén presionado y arrastra para ver más inspiración
+            </div>
           </div>
-          <div class="insta-grid reveal">
-            <img src="https://images.unsplash.com/photo-1520763185298-1b434c919102?auto=format&fit=crop&w=600&q=85" alt="Inspiración floral 1">
-            <img src="https://images.unsplash.com/photo-1533616688419-b7a585564566?auto=format&fit=crop&w=600&q=85" alt="Inspiración floral 2">
-            <img src="https://images.unsplash.com/photo-1494972308805-463bc619d34e?auto=format&fit=crop&w=600&q=85" alt="Inspiración floral 3">
-            <img src="https://images.unsplash.com/photo-1519378058457-4c29a0a2efac?auto=format&fit=crop&w=600&q=85" alt="Inspiración floral 4">
+        </div>
+
+        <div class="floral-carousel-wrap reveal">
+          <div class="floral-carousel" id="floralCarousel" aria-label="Carrusel de inspiración floral">
+            <article class="floral-slide">
+              <img src="https://images.unsplash.com/photo-1520763185298-1b434c919102?auto=format&fit=crop&w=900&q=85" alt="Tulipán rosa de inspiración floral">
+              <span>Tulipanes</span>
+            </article>
+            <article class="floral-slide">
+              <img src="https://images.unsplash.com/photo-1533616688419-b7a585564566?auto=format&fit=crop&w=900&q=85" alt="Ramo floral colorido en florero">
+              <span>Ramos vivos</span>
+            </article>
+            <article class="floral-slide">
+              <img src="https://images.unsplash.com/photo-1494972308805-463bc619d34e?auto=format&fit=crop&w=900&q=85" alt="Rosas rojas elegantes">
+              <span>Rosas</span>
+            </article>
+            <article class="floral-slide">
+              <img src="https://images.unsplash.com/photo-1519378058457-4c29a0a2efac?auto=format&fit=crop&w=900&q=85" alt="Flores rojas abundantes">
+              <span>Color intenso</span>
+            </article>
+            <article class="floral-slide">
+              <img src="https://images.unsplash.com/photo-1487530811176-3780de880c2d?auto=format&fit=crop&w=900&q=85" alt="Flores blancas elegantes">
+              <span>Elegancia</span>
+            </article>
+            <article class="floral-slide">
+              <img src="https://images.unsplash.com/photo-1468327768560-75b778cbb551?auto=format&fit=crop&w=900&q=85" alt="Flores de temporada en tonos cálidos">
+              <span>Temporada</span>
+            </article>
+            <article class="floral-slide">
+              <img src="https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&w=900&q=85" alt="Flores rosas delicadas">
+              <span>Romance</span>
+            </article>
+            <article class="floral-slide">
+              <img src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=85" alt="Flores naturales con textura botánica">
+              <span>Texturas</span>
+            </article>
+            <article class="floral-slide">
+              <img src="https://images.unsplash.com/photo-1508610048659-a06b669e3321?auto=format&fit=crop&w=900&q=85" alt="Bouquet floral elegante">
+              <span>Bouquet</span>
+            </article>
+            <article class="floral-slide">
+              <img src="https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=900&q=85" alt="Arreglo floral con flores suaves">
+              <span>Detalle</span>
+            </article>
           </div>
         </div>
       </section>
@@ -2415,15 +2759,61 @@
         </div>
       </section>
 
+
       <!-- CONTACTO -->
-      <section class="cta-section" id="contacto">
+      <section class="section-padding soft-section" id="contacto">
         <div class="container">
-          <h2>Haz que tu regalo se sienta único.</h2>
-          <p>
-            Cuéntanos la ocasión, la emoción que quieres transmitir y el estilo que imaginas.
-            Nosotros lo convertimos en una composición floral hecha para recordar.
-          </p>
-          <a href="https://wa.me/520000000000" class="btn-main">Cotizar por WhatsApp</a>
+          <div class="row g-4 align-items-stretch">
+            <div class="col-lg-6 reveal">
+              <div class="cart-card h-100">
+                <div class="eyebrow mb-2">Contacto</div>
+                <h2 class="section-title mb-4">Haz que tu regalo se sienta único.</h2>
+                <p class="text-muted-custom mb-4">
+                  Cuéntanos la ocasión, la emoción que quieres transmitir y el estilo que imaginas. Nosotros lo convertimos en una composición floral hecha para recordar.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                  <a href="https://wa.me/520000000000" class="btn-main">
+                    <i class="bi bi-whatsapp me-2"></i>Cotizar por WhatsApp
+                  </a>
+                  <a href="tel:+520000000000" class="btn-secondary-hero" style="color:#27151b; border-color:rgba(39,21,27,.18);">
+                    <i class="bi bi-telephone me-2"></i>Llamar
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6 reveal">
+              <div class="cart-card h-100">
+                <div class="eyebrow mb-2">Horario de atención</div>
+                <h3 class="mb-4">Estamos para ayudarte a elegir el detalle ideal.</h3>
+                <div class="hours-list mb-4">
+                  <div class="hours-line"><strong>Lunes a viernes</strong><span>9:00 a.m. – 7:00 p.m.</span></div>
+                  <div class="hours-line"><strong>Sábado</strong><span>9:00 a.m. – 5:00 p.m.</span></div>
+                  <div class="hours-line"><strong>Domingo</strong><span>Pedidos bajo disponibilidad</span></div>
+                </div>
+                <p class="text-muted-custom mb-0">
+                  Para entregas el mismo día, confirma disponibilidad de flores, horarios y zona por WhatsApp.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-5 reveal">
+            <div class="eyebrow mb-3 text-center">Redes sociales</div>
+            <div class="social-links-grid">
+              <a class="social-link-card" href="https://instagram.com/" target="_blank" rel="noopener">
+                <i class="bi bi-instagram"></i>
+                <span>Instagram</span>
+              </a>
+              <a class="social-link-card" href="https://facebook.com/" target="_blank" rel="noopener">
+                <i class="bi bi-facebook"></i>
+                <span>Facebook</span>
+              </a>
+              <a class="social-link-card" href="https://tiktok.com/" target="_blank" rel="noopener">
+                <i class="bi bi-tiktok"></i>
+                <span>TikTok</span>
+              </a>
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -2438,11 +2828,14 @@
             <h5>Secciones</h5>
             <a href="#momentos" class="d-block mb-2">Momentos</a>
             <a href="#servicios" class="d-block mb-2">Servicios</a>
-            <a href="#temporadas" class="d-block mb-2">Temporada</a>
+            <a href="#novias" class="d-block mb-2">Ramos de novia</a>
+            <a href="#nosotros" class="d-block mb-2">Quiénes somos</a>
+            <a href="#contacto" class="d-block mb-2">Contacto</a>
           </div>
           <div class="col-lg-4">
             <h5>Contacto</h5>
             <p class="mb-2" style="color:rgba(255,248,239,.68);">Zapopan, Jalisco</p>
+            <p class="mb-2" style="color:rgba(255,248,239,.68);">Lunes a viernes 9:00 a.m. – 7:00 p.m.</p>
             <a href="https://wa.me/520000000000">WhatsApp: 52 000 000 0000</a>
           </div>
         </div>
@@ -2535,6 +2928,7 @@
         initReveal();
         initQuiz();
         initCart();
+        initFloralCarousel();
         initSoftPageTransitions();
       });
       
@@ -2622,6 +3016,8 @@
         const chips = document.querySelectorAll('#moodChips .chip');
         const suggestion = document.getElementById('quizSuggestion');
       
+        if (!chips.length || !suggestion) return;
+
         chips.forEach((chip) => {
           chip.addEventListener('click', () => {
             chips.forEach(item => item.classList.remove('active'));
@@ -2704,6 +3100,65 @@
         updateCartBadge();
       }
       
+      
+      function initFloralCarousel() {
+        const carousel = document.getElementById('floralCarousel');
+        if (!carousel) return;
+
+        let isDown = false;
+        let startX = 0;
+        let scrollLeft = 0;
+        let velocity = 0;
+        let lastX = 0;
+        let rafId = null;
+
+        const stopMomentum = () => {
+          if (rafId) cancelAnimationFrame(rafId);
+          rafId = null;
+        };
+
+        const momentum = () => {
+          carousel.scrollLeft -= velocity;
+          velocity *= 0.92;
+
+          if (Math.abs(velocity) > 0.35) {
+            rafId = requestAnimationFrame(momentum);
+          } else {
+            stopMomentum();
+          }
+        };
+
+        carousel.addEventListener('pointerdown', (event) => {
+          isDown = true;
+          stopMomentum();
+          carousel.classList.add('dragging');
+          carousel.setPointerCapture(event.pointerId);
+          startX = event.pageX - carousel.offsetLeft;
+          lastX = startX;
+          scrollLeft = carousel.scrollLeft;
+        });
+
+        carousel.addEventListener('pointermove', (event) => {
+          if (!isDown) return;
+          event.preventDefault();
+          const x = event.pageX - carousel.offsetLeft;
+          const walk = (x - startX) * 1.18;
+          velocity = x - lastX;
+          lastX = x;
+          carousel.scrollLeft = scrollLeft - walk;
+        });
+
+        const endDrag = () => {
+          if (!isDown) return;
+          isDown = false;
+          carousel.classList.remove('dragging');
+          momentum();
+        };
+
+        carousel.addEventListener('pointerup', endDrag);
+        carousel.addEventListener('pointercancel', endDrag);
+        carousel.addEventListener('pointerleave', endDrag);
+      }
       
       function initSoftPageTransitions() {
         const transition = document.getElementById('pageSoftTransition');

@@ -263,10 +263,156 @@
       font-weight: 700;
     }
 
+    .mp-header {
+      margin-bottom: 24px;
+      padding: 18px;
+      border-radius: 28px;
+      background:
+        radial-gradient(circle at 12% 15%, rgba(0, 166, 255, .30), transparent 34%),
+        linear-gradient(135deg, rgba(0, 158, 227, .22), rgba(255,255,255,.08));
+      border: 1px solid rgba(0, 166, 255, .32);
+      box-shadow: 0 22px 55px rgba(0, 166, 255, .13);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mp-header::after {
+      content: '';
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      right: -62px;
+      top: -72px;
+      background: rgba(255,255,255,.10);
+      pointer-events: none;
+    }
+
+    .mp-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .mp-logo-mark {
+      width: 56px;
+      height: 56px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      background: #00a6ff;
+      color: #fff;
+      font-size: 1.75rem;
+      box-shadow: 0 18px 42px rgba(0,166,255,.34);
+      flex: 0 0 auto;
+    }
+
+    .mp-brand strong {
+      display: block;
+      color: #ffffff;
+      font-size: 1.05rem;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .mp-brand span {
+      display: block;
+      color: rgba(255,248,239,.72);
+      font-size: .88rem;
+      margin-top: 4px;
+      line-height: 1.45;
+    }
+
+    .mp-secure-pill {
+      margin-top: 15px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(0, 166, 255, .16);
+      color: #c9efff;
+      border: 1px solid rgba(0,166,255,.28);
+      font-size: .82rem;
+      font-weight: 850;
+      position: relative;
+      z-index: 2;
+    }
+
+    .mp-payment-methods {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      margin: 18px 0 20px;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.09);
+    }
+
+    .mp-payment-methods img {
+      height: 30px;
+      width: auto;
+      object-fit: contain;
+      opacity: .95;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,.18));
+    }
+
+    .mp-trust-box {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 22px;
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(0,166,255,.09);
+      border: 1px solid rgba(0,166,255,.20);
+    }
+
+    .mp-trust-box i {
+      font-size: 1.7rem;
+      color: #00a6ff;
+    }
+
+    .mp-trust-box strong {
+      display: block;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .mp-trust-box small {
+      display: block;
+      color: rgba(255,255,255,.68);
+      line-height: 1.45;
+      margin-top: 2px;
+    }
+
+    #wallet_container {
+      margin-top: 16px;
+    }
+
+    .mp-config-note {
+      margin-top: 14px;
+      padding: 13px 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.06);
+      border: 1px dashed rgba(0,166,255,.28);
+      color: rgba(255,248,239,.68);
+      font-size: .82rem;
+      line-height: 1.5;
+    }
+
+    .mp-config-note strong {
+      color: #c9efff;
+    }
+
     .payment-card {
       padding: 26px;
-      position: sticky;
-      top: 112px;
+      position: relative;
+      z-index: 2;
     }
 
     .summary-row {
@@ -387,7 +533,9 @@
 
     .delivery-card {
       padding: 22px;
-      margin-top: 18px;
+      margin-top: 24px;
+      position: relative;
+      z-index: 1;
     }
 
     .slot-grid {
@@ -682,6 +830,21 @@
 
         <div class="col-lg-5" id="checkout">
           <aside class="glass-card payment-card">
+            <div class="mp-header">
+              <div class="mp-brand">
+                <div class="mp-logo-mark" aria-hidden="true">
+                  <i class="bi bi-shield-check"></i>
+                </div>
+                <div>
+                  <strong>Mercado Pago</strong>
+                  <span>Pago seguro con tarjeta, transferencia o saldo disponible.</span>
+                </div>
+              </div>
+              <div class="mp-secure-pill">
+                <i class="bi bi-lock-fill"></i>
+                Tu dinero está protegido hasta confirmar el pago
+              </div>
+            </div>
             <div class="eyebrow">Resumen y pago</div>
             <h2 class="serif mb-3" style="font-size:2.6rem;">Finalizar pedido</h2>
 
@@ -694,24 +857,32 @@
               <strong id="summaryTotal">$0</strong>
             </div>
 
+            <div class="mp-trust-box">
+              <i class="bi bi-patch-check-fill"></i>
+              <div>
+                <strong>Compra protegida</strong>
+                <small>Mercado Pago procesa el pago de forma segura. Configura tu cuenta para activar el cobro real.</small>
+              </div>
+            </div>
+
             <div class="mb-3">
               <label class="form-label">Nombre de quien recibe</label>
-              <input class="form-control" placeholder="Ej. Andrea Martínez">
+              <input class="form-control" id="receiverName" placeholder="Ej. Andrea Martínez">
             </div>
 
             <div class="mb-3">
               <label class="form-label">Dirección de entrega</label>
-              <input class="form-control" placeholder="Calle, número, colonia">
+              <input class="form-control" id="deliveryAddress" placeholder="Calle, número, colonia">
             </div>
 
             <div class="row g-3">
               <div class="col-6">
                 <label class="form-label">Fecha</label>
-                <input class="form-control" type="date">
+                <input class="form-control" id="deliveryDate" type="date">
               </div>
               <div class="col-6">
                 <label class="form-label">Horario</label>
-                <select class="form-select">
+                <select class="form-select" id="deliverySlot">
                   <option>11:00 am – 1:00 pm</option>
                   <option>1:00 pm – 3:00 pm</option>
                   <option>3:00 pm – 7:00 pm</option>
@@ -722,16 +893,29 @@
             <div class="mt-4">
               <label class="form-label">Método de pago</label>
               <div class="pay-option-grid">
-                <button class="pay-option active"><i class="bi bi-credit-card"></i>Tarjeta</button>
-                <button class="pay-option"><i class="bi bi-bank"></i>Transfer</button>
-                <button class="pay-option"><i class="bi bi-cash-coin"></i>Efectivo</button>
+                <button class="pay-option active" type="button"><i class="bi bi-credit-card"></i>Tarjeta</button>
+                <button class="pay-option" type="button"><i class="bi bi-bank"></i>Transfer</button>
+                <button class="pay-option" type="button"><i class="bi bi-cash-coin"></i>Efectivo</button>
               </div>
             </div>
 
-            <button class="btn-pay">
-              <i class="bi bi-lock-fill me-2"></i>
-              Continuar al pago
+            <div class="mp-payment-methods" aria-label="Métodos compatibles con Mercado Pago">
+              <img src="https://img.icons8.com/color/48/visa.png" alt="Visa">
+              <img src="https://img.icons8.com/color/48/mastercard-logo.png" alt="Mastercard">
+              <img src="https://img.icons8.com/color/48/amex.png" alt="American Express">
+              <img src="https://img.icons8.com/color/48/mercado-pago.png" alt="Mercado Pago">
+            </div>
+
+            <button id="mercadoPagoBtn" class="btn-pay" type="button">
+              <i class="bi bi-shield-lock-fill me-2"></i>
+              Pagar con Mercado Pago
             </button>
+
+            <div id="wallet_container"></div>
+
+            <!--<div class="mp-config-note">
+              <strong>Listo para configurar:</strong> cambia la PUBLIC KEY y conecta el endpoint <code>/api/mercadopago/create-preference</code> en tu backend.
+            </div>-->
 
             <a class="whatsapp-confirm" id="whatsappConfirm" href="https://wa.me/5210000000000" target="_blank" rel="noopener">
               O confirmar pedido por WhatsApp
@@ -739,7 +923,7 @@
 
             <div class="mini-note">
               <i class="bi bi-whatsapp"></i>
-              <span>Este demo puede conectarse después con WhatsApp, Stripe/Mercado Pago o un backend para pedidos reales.</span>
+              <span>Este carrito ya está preparado para integrarse con Mercado Pago mediante una preferencia creada desde tu backend.</span>
             </div>
           </aside>
 
@@ -758,6 +942,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
 
   <script>
     const CART_KEY = 'jhmagno_cart';
@@ -770,6 +955,25 @@
     const summaryDelivery = document.getElementById('summaryDelivery');
     const summaryTotal = document.getElementById('summaryTotal');
     const whatsappConfirm = document.getElementById('whatsappConfirm');
+    const mercadoPagoBtn = document.getElementById('mercadoPagoBtn');
+    const receiverName = document.getElementById('receiverName');
+    const deliveryAddress = document.getElementById('deliveryAddress');
+    const deliveryDate = document.getElementById('deliveryDate');
+    const deliverySlot = document.getElementById('deliverySlot');
+
+    /* =========================================================
+       MERCADO PAGO - CONFIGURACIÓN
+       1) Reemplaza PUBLIC_KEY por tu Public Key de Mercado Pago.
+       2) Crea en tu backend el endpoint BACKEND_CREATE_PREFERENCE_URL.
+       3) Ese endpoint debe crear una preferencia y devolver { preferenceId: '...' }.
+       ========================================================= */
+    const MERCADO_PAGO_PUBLIC_KEY = 'PON_AQUI_TU_PUBLIC_KEY';
+    const BACKEND_CREATE_PREFERENCE_URL = '/api/mercadopago/create-preference';
+
+    let mp = null;
+    if (window.MercadoPago && MERCADO_PAGO_PUBLIC_KEY !== 'PON_AQUI_TU_PUBLIC_KEY') {
+      mp = new MercadoPago(MERCADO_PAGO_PUBLIC_KEY, { locale: 'es-MX' });
+    }
 
     function money(value) {
       return new Intl.NumberFormat('es-MX', {
@@ -906,6 +1110,10 @@
         document.querySelectorAll('.slot-option').forEach(button => button.classList.remove('active'));
         slotOption.classList.add('active');
       }
+    });
+
+    mercadoPagoBtn.addEventListener('click', () => {
+      alert('Mercado Pago aún no está configurado. Aquí se conectará el backend para crear la preferencia de pago.');
     });
 
     renderCart();
