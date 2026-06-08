@@ -66,12 +66,13 @@
       --season-bg-image: url('https://images.unsplash.com/photo-1487530811176-3780de880c2d?auto=format&fit=crop&w=1800&q=85');
       }
       * { box-sizing: border-box; }
-      html { scroll-behavior: smooth; }
+      html { scroll-behavior: auto; overflow-anchor: none; }
       body {
       margin: 0;
       font-family: 'Inter', sans-serif;
       background: var(--flor-dark);
       color: var(--flor-cream);
+      overflow-anchor: none;
       overflow-x: hidden;
       transition: background 700ms ease;
       }
@@ -2156,25 +2157,25 @@
       }
 
       html,
-body {
-  overscroll-behavior-y: none;
-}
+      body {
+        overscroll-behavior-y: none;
+      }
 
-body {
-  overflow-anchor: none;
-}
+      body {
+        overflow-anchor: none;
+      }
 
-@supports (height: 100dvh) {
-  .hero {
-    min-height: 100dvh;
-  }
+      @supports (height: 100dvh) {
+        .hero {
+          min-height: 100dvh;
+        }
 
-  @media (max-width: 575px) {
-    .hero.home-hero {
-      min-height: 100dvh;
-    }
-  }
-}
+        @media (max-width: 575px) {
+          .hero.home-hero {
+            min-height: 100dvh;
+          }
+        }
+      }
 
     </style>
   </head>
@@ -3264,7 +3265,6 @@ body {
           if (!isDown) return;
           isDown = false;
           carousel.classList.remove('dragging');
-          momentum();
         };
 
         carousel.addEventListener('pointerup', endDrag);
