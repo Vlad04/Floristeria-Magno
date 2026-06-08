@@ -937,6 +937,120 @@
         .map-status-card h3 { font-size: 1.65rem; }
       }
 
+      
+      /* =========================================================
+         FIX NAVBAR DESKTOP / LAPTOP NORMAL
+      ========================================================= */
+
+      .navbar-custom .container {
+         max-width: 1440px;
+         padding-left: 32px;
+         padding-right: 32px;
+      }
+
+      .nav-mobile-menu {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+      }
+
+      .nav-link-custom {
+        margin-left: clamp(10px, 1.15vw, 22px);
+        font-size: clamp(0.78rem, 0.86vw, 0.92rem);
+        white-space: nowrap;
+      }
+
+      .btn-reservar {
+        margin-left: clamp(10px, 1.15vw, 22px);
+        padding: 10px 18px;
+        white-space: nowrap;
+      }
+
+      .brand-logo {
+        flex-shrink: 0;
+      }
+
+      @media (max-width: 1280px) {
+        .brand-logo {
+          font-size: 1.35rem;
+          gap: 10px;
+        }
+
+        .brand-logo .logo-mark {
+          width: 48px;
+          height: 48px;
+        }
+
+        .nav-link-custom {
+          margin-left: 12px;
+          font-size: 0.78rem;
+        }
+
+        .btn-reservar {
+          margin-left: 12px;
+          padding: 9px 15px;
+          font-size: 0.78rem;
+        }
+      }
+
+      /* En laptops pequeñas/tablets ya mejor usar menú hamburguesa */
+      @media (max-width: 1100px) {
+        .custom-toggler {
+          display: inline-flex;
+        }
+
+        .nav-mobile-menu {
+          position: absolute;
+          top: calc(100% + 12px);
+          left: 14px;
+          right: 14px;
+          padding: 20px;
+          border-radius: 30px;
+          background: rgba(19,7,13,.96);
+          backdrop-filter: blur(18px);
+          border: 1px solid rgba(255,255,255,.12);
+          box-shadow: 0 24px 70px rgba(0,0,0,.35);
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .nav-mobile-menu .nav-link-custom {
+          margin: 0;
+          padding: 12px 14px;
+          border-radius: 16px;
+          font-size: 0.92rem;
+        }
+
+        .nav-mobile-menu .btn-reservar {
+          width: 100%;
+          margin: 10px 0 0;
+          text-align: center;
+          font-size: 0.92rem;
+        }
+      }
+
+      html,
+      body {
+        overscroll-behavior-y: none;
+      }
+
+      body {
+        overflow-anchor: none;
+      }
+
+      @supports (height: 100dvh) {
+        .hero {
+          min-height: 100dvh;
+        }
+
+        @media (max-width: 575px) {
+          .hero.home-hero {
+            min-height: 100dvh;
+          }
+        }
+      }
+
+
     </style>
   </head>
 
