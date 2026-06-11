@@ -1,0 +1,54 @@
+      .mobile-app-nav {
+        display: none;
+      }
+      .mobile-app-nav {
+                    position: fixed;
+                    left: 14px;
+                    right: 14px;
+                    bottom: 14px;
+                    z-index: 3000;
+                    display: grid;
+                    grid-template-columns: repeat(5, 1fr);
+                    gap: 6px;
+                    padding: 10px;
+                    border-radius: 28px;
+                    background: rgba(19,7,13,.94);
+                    border: 1px solid rgba(255,255,255,.12);
+                    backdrop-filter: blur(20px);
+                    box-shadow: 0 24px 70px rgba(0,0,0,.38);
+                  }
+
+.mobile-app-nav a,
+        .mobile-app-nav button {
+          border: 0 !important;
+          outline: none !important;
+          appearance: none;
+          -webkit-appearance: none;
+          background: transparent !important;
+          min-height: 54px;
+          border-radius: 20px;
+          color: rgba(255,248,239,.72);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          font-size: .66rem;
+          font-weight: 750;
+          padding: 0;
+          font-family: inherit;
+        }
+                .mobile-app-nav i {
+                  font-size: 1.25rem;
+                }
+
+                .mobile-app-nav a.active,
+                .mobile-app-nav a:hover,
+                .mobile-app-nav button:hover {
+                  color: #1a0b10;
+                  background: linear-gradient(135deg, #fff3cf, var(--flor-gold, #d6af65)) !important;
+                }
+
+.mobile-app-nav span {
+  white-space: nowrap;
+}

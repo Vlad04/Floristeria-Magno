@@ -877,7 +877,7 @@
           bottom: 14px;
           z-index: 3000;
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(5, 1fr);
           gap: 6px;
           padding: 10px;
           border-radius: 28px;
@@ -1088,7 +1088,7 @@
         </div>
       </div>
     </nav>
-
+<!--
     <nav class="mobile-app-nav" aria-label="Navegación móvil">
       <a href="index.html#inicio">
         <i class="bi bi-house-heart"></i>
@@ -1098,16 +1098,33 @@
         <i class="bi bi-bag-heart"></i>
         <span>Arreglos</span>
       </a>
+        <a href="carrito.html">
+            <i class="bi bi-basket"></i>
+            <span>Carrito</span>
+        </a>
       <a href="rastreo.html" class="active">
         <i class="bi bi-truck"></i>
         <span>Rastrear</span>
       </a>
-      <a href="carrito.html">
-        <i class="bi bi-basket"></i>
-        <span>Carrito</span>
-      </a>
-    </nav>
+        <a href="ideas.html" class="active">
+            <i class="bi bi-stars"></i>
+            <span>Ideas</span>
+        </a>
 
+    </nav>
+-->
+    <!-- Menú móvil -->
+    <div id="mobile-nav-container"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          fetch("components/mobile-nav.html")
+            .then(response => response.text())
+            .then(data => {
+              document.getElementById("mobile-nav-container").innerHTML = data;
+            });
+        });
+    </script>
     <header class="tracking-hero" id="inicio">
       <div class="container">
         <div class="row align-items-center g-5">
