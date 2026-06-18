@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin CMS | Floristería Juan H Magno</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --dark: #13070d;
+            --wine: #2d0d17;
+            --rose: #d98ca4;
+            --gold: #d6af65;
+            --cream: #fff8ef;
+            --muted: rgba(255, 248, 239, .72);
+            --glass: rgba(255, 255, 255, .08);
+            --border: rgba(255, 255, 255, .14);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, system-ui, sans-serif;
+            color: var(--cream);
+            background:
+                radial-gradient(circle at 20% 20%, rgba(217, 140, 164, .18), transparent 30%),
+                radial-gradient(circle at 80% 30%, rgba(214, 175, 101, .12), transparent 30%),
+                linear-gradient(135deg, #14070d, #2d0d17 55%, #090507);
+            overflow-x: hidden;
+        }
+
+        .admin-shell {
+            width: min(1500px, calc(100% - 44px));
+            margin: auto;
+            padding: 28px 0 70px;
+        }
+
+        .glass {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(18px);
+            border-radius: 30px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, .28);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .brand {
+            font-family: Georgia, serif;
+            font-size: 2rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .brand span {
+            color: var(--gold);
+        }
+
+        .small-muted {
+            color: var(--muted);
+            font-size: .88rem;
+        }
+
+        .topbar {
+            padding: 22px 24px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .tabs-card {
+            padding: 10px;
+            margin-bottom: 18px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 999px;
+            padding: 11px 17px;
+            font-weight: 900;
+            color: var(--cream);
+            background: rgba(255, 255, 255, .07);
+            transition: .25s ease;
+        }
+
+        .tab-btn.active {
+            color: #1a0b10;
+            border-color: transparent;
+            background: linear-gradient(135deg, #fff3cf, var(--gold));
+        }
+
+        .btn-gold {
+            border: 0;
+            border-radius: 999px;
+            padding: 13px 22px;
+            font-weight: 900;
+            color: #1a0b10;
+            background: linear-gradient(135deg, #fff3cf, var(--gold));
+            box-shadow: 0 18px 45px rgba(214, 175, 101, .20);
+            transition: .25s ease;
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.04);
+        }
+
+        .btn-soft {
+            border: 1px solid rgba(255, 255, 255, .14);
+            border-radius: 999px;
+            padding: 11px 18px;
+            font-weight: 850;
+            color: var(--cream);
+            background: rgba(255, 255, 255, .08);
+            transition: .25s ease;
+        }
+
+        .btn-soft:hover {
+            background: rgba(255, 255, 255, .13);
+            color: var(--cream);
+        }
+
+        input,
+        textarea,
+        select {
+            border-radius: 16px !important;
+            border: 1px solid rgba(255, 255, 255, .14) !important;
+            background: rgba(255, 255, 255, .08) !important;
+            color: var(--cream) !important;
+            padding: 13px 14px !important;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: rgba(255, 248, 239, .38) !important;
+        }
+
+        option {
+            color: #171316;
+        }
+
+        label {
+            font-size: .78rem;
+            font-weight: 900;
+            color: var(--muted);
+            margin-bottom: 7px;
+        }
+
+        .login-card {
+            max-width: 460px;
+            margin: 10vh auto;
+            padding: 32px;
+        }
+
+        .content-card {
+            padding: 24px;
+        }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: 1fr 220px 220px;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .table {
+            --bs-table-bg: transparent;
+            --bs-table-color: var(--cream);
+            --bs-table-border-color: rgba(255, 255, 255, .10);
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            color: rgba(255, 248, 239, .72);
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            border-bottom: 1px solid rgba(255, 255, 255, .16);
+            padding: 14px 12px;
+        }
+
+        .table tbody td {
+            padding: 16px 12px;
+            vertical-align: middle;
+        }
+
+        .product-img,
+        .mini-img {
+            width: 74px;
+            height: 74px;
+            object-fit: cover;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, .08);
+            box-shadow: 0 16px 34px rgba(0, 0, 0, .22);
+        }
+
+        .mini-img.wide {
+            width: 118px;
+            height: 72px;
+        }
+
+        .product-title {
+            font-weight: 950;
+            font-size: 1rem;
+        }
+
+        .product-desc {
+            max-width: 420px;
+            color: rgba(255, 248, 239, .62);
+            font-size: .84rem;
+            line-height: 1.45;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            padding: 7px 11px;
+            border-radius: 999px;
+            font-size: .75rem;
+            font-weight: 950;
+        }
+
+        .active-pill {
+            background: rgba(91, 202, 142, .18);
+            color: #9ef0bd;
+        }
+
+        .inactive-pill {
+            background: rgba(255, 95, 95, .16);
+            color: #ffaaaa;
+        }
+
+        .stock-low {
+            color: #ffd37a;
+            font-weight: 900;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .kpi {
+            padding: 18px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid rgba(255, 255, 255, .10);
+        }
+
+        .kpi span {
+            color: var(--muted);
+            font-size: .78rem;
+            font-weight: 850;
+        }
+
+        .kpi strong {
+            display: block;
+            font-size: 1.55rem;
+            margin-top: 4px;
+        }
+
+        .modal-content {
+            color: var(--cream);
+            background:
+                radial-gradient(circle at 20% 20%, rgba(217, 140, 164, .13), transparent 30%),
+                linear-gradient(135deg, rgba(45, 13, 23, .98), rgba(19, 7, 13, .98));
+            border: 1px solid rgba(255, 255, 255, .14);
+            border-radius: 32px;
+            box-shadow: 0 36px 100px rgba(0, 0, 0, .5);
+        }
+
+        .modal-header,
+        .modal-footer {
+            border-color: rgba(255, 255, 255, .10);
+            padding: 22px 26px;
+        }
+
+        .modal-body {
+            padding: 26px;
+        }
+
+        .btn-close {
+            filter: invert(1);
+            opacity: .8;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1.3fr .7fr .7fr .9fr;
+            gap: 16px;
+        }
+
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .image-uploader {
+            min-height: 310px;
+            border-radius: 26px;
+            background: rgba(255, 255, 255, .07);
+            border: 1px dashed rgba(255, 255, 255, .24);
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 18px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: .25s ease;
+        }
+
+        .image-uploader:hover {
+            background: rgba(255, 255, 255, .10);
+            border-color: rgba(214, 175, 101, .45);
+        }
+
+        .image-uploader img {
+            width: 100%;
+            height: 310px;
+            object-fit: cover;
+            border-radius: 22px;
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            color: var(--gold);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .settings-box {
+            padding: 22px;
+            border-radius: 26px;
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid rgba(255, 255, 255, .10);
+        }
+
+        @media (max-width: 992px) {
+
+            .toolbar,
+            .form-grid,
+            .form-grid-2,
+            .kpi-grid,
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-shell {
+                width: min(100% - 24px, 1500px);
+            }
+        }
+
+        /* Quitar flechas de input number */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            appearance: textfield;
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="admin-shell">
+
+        <section id="loginView" class="login-card glass">
+            <div class="mb-4">
+                <div class="brand">Juan H <span>Magno</span></div>
+                <p class="small-muted mt-2 mb-0">Panel privado para administrar página, catálogo, secciones, fotos y
+                    datos generales.</p>
+            </div>
+
+            <div class="mb-3">
+                <label>Usuario</label>
+                <input id="loginUser" class="form-control" placeholder="Ej. dueño">
+            </div>
+
+            <div class="mb-3">
+                <label>Contraseña</label>
+                <input id="loginPass" type="password" class="form-control" placeholder="Contraseña">
+            </div>
+
+            <button class="btn-gold w-100" onclick="loginAdmin()">Entrar al panel</button>
+
+            <p class="small-muted mt-3 mb-0">Modo demo activo: entra sin validar servidor.</p>
+        </section>
+
+        <section id="adminView" class="hidden">
+
+            <div class="topbar glass">
+                <div>
+                    <div class="brand">Admin <span>CMS</span></div>
+                    <p class="small-muted mb-0">Control visual de productos, secciones, galería y configuración.</p>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn-soft" onclick="loadAllData()">
+                        <i class="bi bi-arrow-clockwise"></i> Actualizar
+                    </button>
+                    <button class="btn-gold" id="mainActionBtn" onclick="openProductModal()">
+                        <i class="bi bi-plus-lg"></i> Nuevo producto
+                    </button>
+                    <button class="btn-soft" onclick="logoutAdmin()">Salir</button>
+                </div>
+            </div>
+
+            <div class="tabs-card glass">
+                <button class="tab-btn active" onclick="setTab('products')">
+                    <i class="bi bi-flower1"></i> Productos
+                </button>
+                <button class="tab-btn" onclick="setTab('sections')">
+                    <i class="bi bi-layout-text-window-reverse"></i> Secciones
+                </button>
+                <button class="tab-btn" onclick="setTab('gallery')">
+                    <i class="bi bi-images"></i> Galería
+                </button>
+                <button class="tab-btn" onclick="setTab('settings')">
+                    <i class="bi bi-gear"></i> Configuración
+                </button>
+            </div>
+
+            <section id="tabProducts">
+                <div class="kpi-grid">
+                    <div class="kpi">
+                        <span>Productos activos</span>
+                        <strong id="kpiActive">0</strong>
+                    </div>
+                    <div class="kpi">
+                        <span>Productos ocultos</span>
+                        <strong id="kpiInactive">0</strong>
+                    </div>
+                    <div class="kpi">
+                        <span>Inventario total</span>
+                        <strong id="kpiStock">0</strong>
+                    </div>
+                    <div class="kpi">
+                        <span>Precio promedio</span>
+                        <strong id="kpiAvg">$0</strong>
+                    </div>
+                </div>
+
+                <div class="content-card glass">
+                    <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-3">
+                        <div>
+                            <h2 class="mb-1">Productos</h2>
+                            <p class="small-muted mb-0">Estos productos alimentan el catálogo público.</p>
+                        </div>
+                    </div>
+
+                    <div class="toolbar">
+                        <input id="searchInput" class="form-control" placeholder="Buscar producto o categoría..."
+                            oninput="renderProducts()">
+
+                        <select id="categoryFilter" class="form-select" onchange="renderProducts()">
+                            <option value="">Todas las categorías</option>
+                            <option>Ramos</option>
+                            <option>Arreglos</option>
+                            <option>Rosas</option>
+                            <option>Cumpleaños</option>
+                            <option>Aniversario</option>
+                            <option>Funerario</option>
+                            <option>Temporada</option>
+                        </select>
+
+                        <select id="statusFilter" class="form-select" onchange="renderProducts()">
+                            <option value="">Todos los estados</option>
+                            <option value="SI">Activos</option>
+                            <option value="NO">Ocultos</option>
+                        </select>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tabSections" class="hidden">
+                <div class="content-card glass">
+                    <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-3">
+                        <div>
+                            <h2 class="mb-1">Secciones de la página</h2>
+                            <p class="small-muted mb-0">Controla qué imagen, producto o texto aparece en cada parte del
+                                sitio.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Sección</th>
+                                    <th>Imagen</th>
+                                    <th>Título / texto</th>
+                                    <th>Producto ligado</th>
+                                    <th>Orden</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sectionsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tabGallery" class="hidden">
+                <div class="content-card glass">
+                    <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-3">
+                        <div>
+                            <h2 class="mb-1">Galería</h2>
+                            <p class="small-muted mb-0">Fotos decorativas o de trabajos reales que no necesariamente son
+                                productos.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Imagen</th>
+                                    <th>Título</th>
+                                    <th>Categoría</th>
+                                    <th>Orden</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="galleryTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tabSettings" class="hidden">
+                <div class="content-card glass">
+                    <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-4">
+                        <div>
+                            <h2 class="mb-1">Configuración general</h2>
+                            <p class="small-muted mb-0">Datos generales de contacto y textos principales del sitio.</p>
+                        </div>
+
+                        <button class="btn-gold" onclick="saveSettings()">
+                            <i class="bi bi-save"></i> Guardar configuración
+                        </button>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="settings-box">
+                            <h4>Negocio</h4>
+
+                            <div class="mb-3">
+                                <label>Nombre del negocio</label>
+                                <input id="settingBusinessName" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>WhatsApp</label>
+                                <input id="settingWhatsapp" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Dirección</label>
+                                <input id="settingAddress" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Horario</label>
+                                <input id="settingHours" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="settings-box">
+                            <h4>Portada</h4>
+
+                            <div class="mb-3">
+                                <label>Título principal</label>
+                                <input id="settingHeroTitle" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Subtítulo</label>
+                                <textarea id="settingHeroSubtitle" class="form-control" rows="4"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Texto del botón principal</label>
+                                <input id="settingHeroButton" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Instagram / Facebook</label>
+                                <input id="settingSocial" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </section>
+    </main>
+
+    <!-- MODAL PRODUCTO -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h3 id="productModalTitle" class="mb-1">Nuevo producto</h3>
+                        <p class="small-muted mb-0">Carga la información del arreglo floral.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input id="productId" type="hidden">
+
+                    <div class="row g-4">
+                        <div class="col-lg-5">
+                            <label>Imagen del producto</label>
+
+                            <div class="image-uploader" onclick="document.getElementById('productImageFile').click()">
+                                <div id="productImagePreview">
+                                    <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                                    <h5 class="mt-3 mb-1">Cargar imagen</h5>
+                                    <p class="small-muted mb-0">Selecciona una foto desde la computadora o celular.</p>
+                                </div>
+                            </div>
+
+                            <input id="productImageFile" type="file" accept="image/*" class="d-none"
+                                onchange="handleImageFile(event, 'product')">
+
+                            <div class="mt-3">
+                                <label>O pegar URL de Google Drive</label>
+                                <input id="productImageUrl" class="form-control"
+                                    placeholder="Link de Drive o URL de imagen" oninput="previewImageUrl('product')">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-7">
+                            <div class="form-grid mb-3">
+                                <div>
+                                    <label>Nombre del arreglo</label>
+                                    <input id="productName" class="form-control" placeholder="Ramo Rosas Premium">
+                                </div>
+
+                                <div>
+                                    <label>Precio</label>
+                                    <input id="productPrice" type="number" class="form-control" placeholder="899">
+                                </div>
+
+                                <div>
+                                    <label>Stock</label>
+                                    <input id="productStock" type="number" class="form-control" placeholder="5">
+                                </div>
+
+                                <div>
+                                    <label>Estado</label>
+                                    <select id="productActive" class="form-select">
+                                        <option value="SI">Activo</option>
+                                        <option value="NO">Oculto</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-grid-2 mb-3">
+                                <div>
+                                    <label>Categoría</label>
+                                    <select id="productCategory" class="form-select">
+                                        <option>Ramos</option>
+                                        <option>Arreglos</option>
+                                        <option>Rosas</option>
+                                        <option>Cumpleaños</option>
+                                        <option>Aniversario</option>
+                                        <option>Funerario</option>
+                                        <option>Temporada</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label>Etiqueta / ocasión</label>
+                                    <input id="productTag" class="form-control"
+                                        placeholder="Amor, cumpleaños, elegante...">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Descripción</label>
+                                <textarea id="productDescription" class="form-control" rows="7"
+                                    placeholder="Descripción visible en la página"></textarea>
+                            </div>
+
+                            <div class="form-grid-2">
+                                <div>
+                                    <label>Producto destacado</label>
+                                    <select id="productFeatured" class="form-select">
+                                        <option value="NO">No</option>
+                                        <option value="SI">Sí</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label>Orden de aparición</label>
+                                    <input id="productSortOrder" type="number" class="form-control" placeholder="1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-soft" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn-gold" onclick="saveProduct()">
+                        <i class="bi bi-save"></i> Guardar producto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SECCIÓN -->
+    <div class="modal fade" id="sectionModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h3 id="sectionModalTitle" class="mb-1">Nueva sección</h3>
+                        <p class="small-muted mb-0">Define qué aparece en cada bloque de la página.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input id="sectionId" type="hidden">
+
+                    <div class="row g-4">
+                        <div class="col-lg-5">
+                            <label>Imagen de sección</label>
+
+                            <div class="image-uploader" onclick="document.getElementById('sectionImageFile').click()">
+                                <div id="sectionImagePreview">
+                                    <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                                    <h5 class="mt-3 mb-1">Cargar imagen</h5>
+                                    <p class="small-muted mb-0">Para hero, banners o bloques visuales.</p>
+                                </div>
+                            </div>
+
+                            <input id="sectionImageFile" type="file" accept="image/*" class="d-none"
+                                onchange="handleImageFile(event, 'section')">
+
+                            <div class="mt-3">
+                                <label>O pegar URL de imagen</label>
+                                <input id="sectionImageUrl" class="form-control"
+                                    placeholder="Link de Drive o URL de imagen" oninput="previewImageUrl('section')">
+                            </div>
+                        </div>
+
+                        <div class="col-lg-7">
+                            <div class="form-grid-2 mb-3">
+                                <div>
+                                    <label>Sección</label>
+                                    <select id="sectionKey" class="form-select">
+                                        <option value="hero">Hero / portada</option>
+                                        <option value="destacados">Productos destacados</option>
+                                        <option value="momentos">Momentos especiales</option>
+                                        <option value="servicios">Servicios</option>
+                                        <option value="catalogo">Catálogo principal</option>
+                                        <option value="novias">Ramos de novia</option>
+                                        <option value="temporada">Temporada</option>
+                                        <option value="promociones">Promociones</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label>Producto ligado</label>
+                                    <select id="sectionProductId" class="form-select"></select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Título</label>
+                                <input id="sectionTitle" class="form-control"
+                                    placeholder="Arte floral para momentos inolvidables">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Subtítulo / descripción corta</label>
+                                <textarea id="sectionSubtitle" class="form-control" rows="5"
+                                    placeholder="Texto visible en esa sección"></textarea>
+                            </div>
+
+                            <div class="form-grid-2">
+                                <div>
+                                    <label>Orden</label>
+                                    <input id="sectionSortOrder" type="number" class="form-control" placeholder="1">
+                                </div>
+
+                                <div>
+                                    <label>Estado</label>
+                                    <select id="sectionActive" class="form-select">
+                                        <option value="SI">Activo</option>
+                                        <option value="NO">Oculto</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-soft" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn-gold" onclick="saveSection()">
+                        <i class="bi bi-save"></i> Guardar sección
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GALERÍA -->
+    <div class="modal fade" id="galleryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h3 id="galleryModalTitle" class="mb-1">Nueva imagen</h3>
+                        <p class="small-muted mb-0">Agrega fotos decorativas o trabajos reales.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input id="galleryId" type="hidden">
+
+                    <label>Imagen</label>
+                    <div class="image-uploader mb-3" onclick="document.getElementById('galleryImageFile').click()">
+                        <div id="galleryImagePreview">
+                            <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                            <h5 class="mt-3 mb-1">Cargar imagen</h5>
+                            <p class="small-muted mb-0">Selecciona una imagen para galería.</p>
+                        </div>
+                    </div>
+
+                    <input id="galleryImageFile" type="file" accept="image/*" class="d-none"
+                        onchange="handleImageFile(event, 'gallery')">
+
+                    <div class="mb-3">
+                        <label>O pegar URL de imagen</label>
+                        <input id="galleryImageUrl" class="form-control" placeholder="Link de Drive o URL de imagen"
+                            oninput="previewImageUrl('gallery')">
+                    </div>
+
+                    <div class="form-grid-2 mb-3">
+                        <div>
+                            <label>Título</label>
+                            <input id="galleryTitle" class="form-control" placeholder="Ramo para aniversario">
+                        </div>
+
+                        <div>
+                            <label>Categoría</label>
+                            <select id="galleryCategory" class="form-select">
+                                <option>General</option>
+                                <option>Ramos</option>
+                                <option>Eventos</option>
+                                <option>Bodas</option>
+                                <option>Detalles</option>
+                                <option>Temporada</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div>
+                            <label>Orden</label>
+                            <input id="gallerySortOrder" type="number" class="form-control" placeholder="1">
+                        </div>
+
+                        <div>
+                            <label>Estado</label>
+                            <select id="galleryActive" class="form-select">
+                                <option value="SI">Activo</option>
+                                <option value="NO">Oculto</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn-soft" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn-gold" onclick="saveGalleryItem()">
+                        <i class="bi bi-save"></i> Guardar imagen
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const API_URL = "PEGA_AQUI_TU_URL_DE_APPS_SCRIPT";
+
+        let products = [];
+        let sections = [];
+        let gallery = [];
+        let settings = {};
+
+        let currentTab = "products";
+
+        let productModal;
+        let sectionModal;
+        let galleryModal;
+
+        let selectedProductImageBase64 = "";
+        let selectedSectionImageBase64 = "";
+        let selectedGalleryImageBase64 = "";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            productModal = new bootstrap.Modal(document.getElementById("productModal"));
+            sectionModal = new bootstrap.Modal(document.getElementById("sectionModal"));
+            galleryModal = new bootstrap.Modal(document.getElementById("galleryModal"));
+        });
+
+        function getDeviceId() {
+            let id = localStorage.getItem("flor_admin_device_id");
+
+            if (!id) {
+                id = "device_" + crypto.randomUUID();
+                localStorage.setItem("flor_admin_device_id", id);
+            }
+
+            return id;
+        }
+
+        function convertDriveUrl(url) {
+            if (!url) return "";
+
+            const match = url.match(/\/d\/([^/]+)/) || url.match(/id=([^&]+)/);
+
+            if (match && match[1]) {
+                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+            }
+
+            return url;
+        }
+
+        async function apiRequest(payload) {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+
+            return await response.json();
+        }
+
+        /*
+        // LOGIN REAL PARA CUANDO CONECTEMOS GOOGLE APPS SCRIPT
+        async function loginAdmin() {
+          const user = document.getElementById("loginUser").value.trim();
+          const password = document.getElementById("loginPass").value.trim();
+    
+          if (!user || !password) {
+            alert("Ingresa usuario y contraseña.");
+            return;
+          }
+    
+          try {
+            const result = await apiRequest({
+              action: "login",
+              user,
+              password,
+              deviceId: getDeviceId()
+            });
+    
+            if (!result.success) {
+              alert(result.message || "Acceso denegado.");
+              return;
+            }
+    
+            sessionStorage.setItem("flor_admin_token", result.token);
+    
+            document.getElementById("loginView").classList.add("hidden");
+            document.getElementById("adminView").classList.remove("hidden");
+    
+            loadAllData();
+    
+          } catch (error) {
+            console.error(error);
+            alert("No se pudo conectar con el servidor.");
+          }
+        }
+        */
+
+        // BYPASS TEMPORAL: DEJA PASAR SIN VALIDAR SERVIDOR
+        async function loginAdmin() {
+            sessionStorage.setItem("flor_admin_token", "modo_desarrollo");
+
+            document.getElementById("loginView").classList.add("hidden");
+            document.getElementById("adminView").classList.remove("hidden");
+
+            loadDemoData();
+            renderAll();
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem("flor_admin_token");
+            location.reload();
+        }
+
+        function loadDemoData() {
+            products = [
+                {
+                    id: "prod_001",
+                    name: "Ramo Rosas Premium",
+                    price: 899,
+                    stock: 5,
+                    category: "Ramos",
+                    tag: "Amor",
+                    description: "Rosas premium con follaje elegante, ideal para aniversarios o detalles especiales.",
+                    imageUrl: "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=900&q=80",
+                    active: "SI",
+                    featured: "SI",
+                    sortOrder: 1
+                },
+                {
+                    id: "prod_002",
+                    name: "Arreglo Elegance",
+                    price: 1299,
+                    stock: 3,
+                    category: "Arreglos",
+                    tag: "Elegante",
+                    description: "Arreglo floral de estilo fino para regalo, mesa principal o celebración especial.",
+                    imageUrl: "https://images.unsplash.com/photo-1563241527-3004b7be0ffd?auto=format&fit=crop&w=900&q=80",
+                    active: "SI",
+                    featured: "NO",
+                    sortOrder: 2
+                },
+                {
+                    id: "prod_003",
+                    name: "Ramo Primavera",
+                    price: 749,
+                    stock: 8,
+                    category: "Temporada",
+                    tag: "Colorido",
+                    description: "Ramo fresco con tonos suaves y flores de temporada.",
+                    imageUrl: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=900&q=80",
+                    active: "SI",
+                    featured: "SI",
+                    sortOrder: 3
+                }
+            ];
+
+            sections = [
+                {
+                    id: "sec_001",
+                    sectionKey: "hero",
+                    title: "Arte floral para momentos inolvidables",
+                    subtitle: "Diseños florales contemporáneos para regalos, eventos y detalles especiales.",
+                    imageUrl: "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&w=1200&q=80",
+                    productId: "",
+                    sortOrder: 1,
+                    active: "SI"
+                },
+                {
+                    id: "sec_002",
+                    sectionKey: "destacados",
+                    title: "Nuestros favoritos",
+                    subtitle: "Arreglos seleccionados por su elegancia, frescura y estilo.",
+                    imageUrl: "",
+                    productId: "prod_001",
+                    sortOrder: 1,
+                    active: "SI"
+                },
+                {
+                    id: "sec_003",
+                    sectionKey: "destacados",
+                    title: "Nuestros favoritos",
+                    subtitle: "Arreglos seleccionados por su elegancia, frescura y estilo.",
+                    imageUrl: "",
+                    productId: "prod_003",
+                    sortOrder: 2,
+                    active: "SI"
+                }
+            ];
+
+            gallery = [
+                {
+                    id: "gal_001",
+                    title: "Mesa floral elegante",
+                    category: "Eventos",
+                    imageUrl: "https://images.unsplash.com/photo-1487070183336-b863922373d4?auto=format&fit=crop&w=900&q=80",
+                    sortOrder: 1,
+                    active: "SI"
+                },
+                {
+                    id: "gal_002",
+                    title: "Ramo romántico",
+                    category: "Ramos",
+                    imageUrl: "https://images.unsplash.com/photo-1457089328109-e5d9bd499191?auto=format&fit=crop&w=900&q=80",
+                    sortOrder: 2,
+                    active: "SI"
+                }
+            ];
+
+            settings = {
+                businessName: "Floristería Juan H Magno",
+                whatsapp: "+52 33 0000 0000",
+                address: "Guadalajara, Jalisco",
+                hours: "Lunes a sábado de 9:00 a 19:00",
+                heroTitle: "Arte floral para momentos inolvidables",
+                heroSubtitle: "Cada ramo es único y especial. Diseños florales con intención, belleza y frescura.",
+                heroButton: "Ver catálogo",
+                social: "@juanhmagno"
+            };
+        }
+
+        async function loadAllData() {
+            renderAll();
+
+            /*
+            // CÓDIGO REAL PARA DESPUÉS CON APPS SCRIPT
+            const token = sessionStorage.getItem("flor_admin_token");
+      
+            const result = await apiRequest({
+              action: "getAll",
+              token,
+              deviceId: getDeviceId()
+            });
+      
+            if (!result.success) {
+              alert(result.message || "No se pudo cargar la información.");
+              return;
+            }
+      
+            products = result.products || [];
+            sections = result.sections || [];
+            gallery = result.gallery || [];
+            settings = result.settings || {};
+      
+            renderAll();
+            */
+        }
+
+        function renderAll() {
+            renderProducts();
+            renderSections();
+            renderGallery();
+            renderSettings();
+            fillProductOptions();
+        }
+
+        function setTab(tab) {
+            currentTab = tab;
+
+            document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+            event.currentTarget.classList.add("active");
+
+            document.getElementById("tabProducts").classList.toggle("hidden", tab !== "products");
+            document.getElementById("tabSections").classList.toggle("hidden", tab !== "sections");
+            document.getElementById("tabGallery").classList.toggle("hidden", tab !== "gallery");
+            document.getElementById("tabSettings").classList.toggle("hidden", tab !== "settings");
+
+            const mainBtn = document.getElementById("mainActionBtn");
+
+            if (tab === "products") {
+                mainBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Nuevo producto';
+                mainBtn.onclick = openProductModal;
+                mainBtn.classList.remove("hidden");
+            }
+
+            if (tab === "sections") {
+                mainBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Nueva sección';
+                mainBtn.onclick = openSectionModal;
+                mainBtn.classList.remove("hidden");
+            }
+
+            if (tab === "gallery") {
+                mainBtn.innerHTML = '<i class="bi bi-plus-lg"></i> Nueva imagen';
+                mainBtn.onclick = openGalleryModal;
+                mainBtn.classList.remove("hidden");
+            }
+
+            if (tab === "settings") {
+                mainBtn.classList.add("hidden");
+            }
+        }
+
+        function renderProducts() {
+            const tbody = document.getElementById("productsTable");
+            const search = document.getElementById("searchInput")?.value.toLowerCase() || "";
+            const category = document.getElementById("categoryFilter")?.value || "";
+            const status = document.getElementById("statusFilter")?.value || "";
+
+            let filtered = products.filter(p => {
+                const matchesSearch =
+                    String(p.name || "").toLowerCase().includes(search) ||
+                    String(p.category || "").toLowerCase().includes(search) ||
+                    String(p.description || "").toLowerCase().includes(search);
+
+                const matchesCategory = !category || p.category === category;
+                const matchesStatus = !status || p.active === status;
+
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+
+            filtered.sort((a, b) => Number(a.sortOrder || 999) - Number(b.sortOrder || 999));
+
+            if (!filtered.length) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center small-muted py-5">No hay productos para mostrar.</td></tr>`;
+                updateKpis();
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(p => `
+        <tr>
+          <td><img class="product-img" src="${convertDriveUrl(p.imageUrl)}" onerror="this.src='https://via.placeholder.com/120?text=Foto'"></td>
+          <td>
+            <div class="product-title">${escapeHtml(p.name || "")}</div>
+            <div class="product-desc">${escapeHtml(p.description || "")}</div>
+          </td>
+          <td>
+            ${escapeHtml(p.category || "")}
+            ${p.tag ? `<div class="small-muted">${escapeHtml(p.tag)}</div>` : ""}
+          </td>
+          <td><strong>$${Number(p.price || 0).toLocaleString("es-MX")}</strong></td>
+          <td class="${Number(p.stock || 0) <= 3 ? "stock-low" : ""}">${Number(p.stock || 0)}</td>
+          <td>
+            <span class="status-pill ${p.active === "SI" ? "active-pill" : "inactive-pill"}">
+              ${p.active === "SI" ? "Activo" : "Oculto"}
+            </span>
+          </td>
+          <td class="text-end">
+            <button class="btn-soft btn-sm" onclick='editProduct("${p.id}")'><i class="bi bi-pencil"></i> Editar</button>
+            <button class="btn-soft btn-sm ms-1" onclick='toggleProduct("${p.id}")'>${p.active === "SI" ? "Ocultar" : "Activar"}</button>
+          </td>
+        </tr>
+      `).join("");
+
+            updateKpis();
+        }
+
+        function updateKpis() {
+            const active = products.filter(p => p.active === "SI").length;
+            const inactive = products.filter(p => p.active !== "SI").length;
+            const stock = products.reduce((sum, p) => sum + Number(p.stock || 0), 0);
+            const avg = products.length ? products.reduce((sum, p) => sum + Number(p.price || 0), 0) / products.length : 0;
+
+            document.getElementById("kpiActive").textContent = active;
+            document.getElementById("kpiInactive").textContent = inactive;
+            document.getElementById("kpiStock").textContent = stock;
+            document.getElementById("kpiAvg").textContent = "$" + Math.round(avg).toLocaleString("es-MX");
+        }
+
+        function renderSections() {
+            const tbody = document.getElementById("sectionsTable");
+
+            if (!sections.length) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center small-muted py-5">No hay secciones.</td></tr>`;
+                return;
+            }
+
+            const sorted = [...sections].sort((a, b) => {
+                if (a.sectionKey === b.sectionKey) return Number(a.sortOrder || 999) - Number(b.sortOrder || 999);
+                return String(a.sectionKey).localeCompare(String(b.sectionKey));
+            });
+
+            tbody.innerHTML = sorted.map(s => {
+                const product = products.find(p => p.id === s.productId);
+
+                return `
+          <tr>
+            <td><strong>${sectionLabel(s.sectionKey)}</strong></td>
+            <td>
+              ${s.imageUrl ? `<img class="mini-img wide" src="${convertDriveUrl(s.imageUrl)}" onerror="this.src='https://via.placeholder.com/140?text=Imagen'">` : `<span class="small-muted">Sin imagen</span>`}
+            </td>
+            <td>
+              <div class="product-title">${escapeHtml(s.title || "")}</div>
+              <div class="product-desc">${escapeHtml(s.subtitle || "")}</div>
+            </td>
+            <td>${product ? escapeHtml(product.name) : '<span class="small-muted">Sin producto</span>'}</td>
+            <td>${s.sortOrder || ""}</td>
+            <td>
+              <span class="status-pill ${s.active === "SI" ? "active-pill" : "inactive-pill"}">
+                ${s.active === "SI" ? "Activo" : "Oculto"}
+              </span>
+            </td>
+            <td class="text-end">
+              <button class="btn-soft btn-sm" onclick='editSection("${s.id}")'><i class="bi bi-pencil"></i> Editar</button>
+              <button class="btn-soft btn-sm ms-1" onclick='toggleSection("${s.id}")'>${s.active === "SI" ? "Ocultar" : "Activar"}</button>
+            </td>
+          </tr>
+        `;
+            }).join("");
+        }
+
+        function renderGallery() {
+            const tbody = document.getElementById("galleryTable");
+
+            if (!gallery.length) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center small-muted py-5">No hay imágenes.</td></tr>`;
+                return;
+            }
+
+            const sorted = [...gallery].sort((a, b) => Number(a.sortOrder || 999) - Number(b.sortOrder || 999));
+
+            tbody.innerHTML = sorted.map(g => `
+        <tr>
+          <td><img class="mini-img wide" src="${convertDriveUrl(g.imageUrl)}" onerror="this.src='https://via.placeholder.com/140?text=Imagen'"></td>
+          <td><strong>${escapeHtml(g.title || "")}</strong></td>
+          <td>${escapeHtml(g.category || "")}</td>
+          <td>${g.sortOrder || ""}</td>
+          <td>
+            <span class="status-pill ${g.active === "SI" ? "active-pill" : "inactive-pill"}">
+              ${g.active === "SI" ? "Activo" : "Oculto"}
+            </span>
+          </td>
+          <td class="text-end">
+            <button class="btn-soft btn-sm" onclick='editGalleryItem("${g.id}")'><i class="bi bi-pencil"></i> Editar</button>
+            <button class="btn-soft btn-sm ms-1" onclick='toggleGalleryItem("${g.id}")'>${g.active === "SI" ? "Ocultar" : "Activar"}</button>
+          </td>
+        </tr>
+      `).join("");
+        }
+
+        function renderSettings() {
+            document.getElementById("settingBusinessName").value = settings.businessName || "";
+            document.getElementById("settingWhatsapp").value = settings.whatsapp || "";
+            document.getElementById("settingAddress").value = settings.address || "";
+            document.getElementById("settingHours").value = settings.hours || "";
+            document.getElementById("settingHeroTitle").value = settings.heroTitle || "";
+            document.getElementById("settingHeroSubtitle").value = settings.heroSubtitle || "";
+            document.getElementById("settingHeroButton").value = settings.heroButton || "";
+            document.getElementById("settingSocial").value = settings.social || "";
+        }
+
+        function fillProductOptions() {
+            const select = document.getElementById("sectionProductId");
+            select.innerHTML = `<option value="">Sin producto ligado</option>` + products.map(p => `
+        <option value="${p.id}">${escapeHtml(p.name)}</option>
+      `).join("");
+        }
+
+        function openProductModal() {
+            clearProductForm();
+            document.getElementById("productModalTitle").textContent = "Nuevo producto";
+            productModal.show();
+        }
+
+        function editProduct(id) {
+            const p = products.find(item => item.id === id);
+            if (!p) return;
+
+            document.getElementById("productModalTitle").textContent = "Editar producto";
+            document.getElementById("productId").value = p.id || "";
+            document.getElementById("productName").value = p.name || "";
+            document.getElementById("productPrice").value = p.price || "";
+            document.getElementById("productStock").value = p.stock || "";
+            document.getElementById("productCategory").value = p.category || "Ramos";
+            document.getElementById("productTag").value = p.tag || "";
+            document.getElementById("productDescription").value = p.description || "";
+            document.getElementById("productImageUrl").value = p.imageUrl || "";
+            document.getElementById("productActive").value = p.active || "SI";
+            document.getElementById("productFeatured").value = p.featured || "NO";
+            document.getElementById("productSortOrder").value = p.sortOrder || "";
+            selectedProductImageBase64 = "";
+
+            setImagePreview("product", p.imageUrl);
+            productModal.show();
+        }
+
+        function clearProductForm() {
+            document.getElementById("productId").value = "";
+            document.getElementById("productName").value = "";
+            document.getElementById("productPrice").value = "";
+            document.getElementById("productStock").value = "";
+            document.getElementById("productCategory").value = "Ramos";
+            document.getElementById("productTag").value = "";
+            document.getElementById("productDescription").value = "";
+            document.getElementById("productImageUrl").value = "";
+            document.getElementById("productActive").value = "SI";
+            document.getElementById("productFeatured").value = "NO";
+            document.getElementById("productSortOrder").value = "";
+            document.getElementById("productImageFile").value = "";
+            selectedProductImageBase64 = "";
+            resetImagePreview("product", "Selecciona una foto desde la computadora o celular.");
+        }
+
+        function saveProduct() {
+            const product = {
+                id: document.getElementById("productId").value || crypto.randomUUID(),
+                name: document.getElementById("productName").value.trim(),
+                price: Number(document.getElementById("productPrice").value || 0),
+                stock: Number(document.getElementById("productStock").value || 0),
+                category: document.getElementById("productCategory").value,
+                tag: document.getElementById("productTag").value.trim(),
+                description: document.getElementById("productDescription").value.trim(),
+                imageUrl: selectedProductImageBase64 || document.getElementById("productImageUrl").value.trim(),
+                active: document.getElementById("productActive").value,
+                featured: document.getElementById("productFeatured").value,
+                sortOrder: Number(document.getElementById("productSortOrder").value || products.length + 1)
+            };
+
+            if (!product.name || !product.price) {
+                alert("Nombre y precio son obligatorios.");
+                return;
+            }
+
+            const index = products.findIndex(p => p.id === product.id);
+
+            if (index >= 0) products[index] = product;
+            else products.push(product);
+
+            renderAll();
+            productModal.hide();
+        }
+
+        function toggleProduct(id) {
+            const p = products.find(item => item.id === id);
+            if (!p) return;
+            p.active = p.active === "SI" ? "NO" : "SI";
+            renderAll();
+        }
+
+        function openSectionModal() {
+            clearSectionForm();
+            document.getElementById("sectionModalTitle").textContent = "Nueva sección";
+            fillProductOptions();
+            sectionModal.show();
+        }
+
+        function editSection(id) {
+            const s = sections.find(item => item.id === id);
+            if (!s) return;
+
+            fillProductOptions();
+
+            document.getElementById("sectionModalTitle").textContent = "Editar sección";
+            document.getElementById("sectionId").value = s.id || "";
+            document.getElementById("sectionKey").value = s.sectionKey || "hero";
+            document.getElementById("sectionTitle").value = s.title || "";
+            document.getElementById("sectionSubtitle").value = s.subtitle || "";
+            document.getElementById("sectionImageUrl").value = s.imageUrl || "";
+            document.getElementById("sectionProductId").value = s.productId || "";
+            document.getElementById("sectionSortOrder").value = s.sortOrder || "";
+            document.getElementById("sectionActive").value = s.active || "SI";
+            selectedSectionImageBase64 = "";
+
+            setImagePreview("section", s.imageUrl);
+            sectionModal.show();
+        }
+
+        function clearSectionForm() {
+            document.getElementById("sectionId").value = "";
+            document.getElementById("sectionKey").value = "hero";
+            document.getElementById("sectionTitle").value = "";
+            document.getElementById("sectionSubtitle").value = "";
+            document.getElementById("sectionImageUrl").value = "";
+            document.getElementById("sectionProductId").value = "";
+            document.getElementById("sectionSortOrder").value = "";
+            document.getElementById("sectionActive").value = "SI";
+            document.getElementById("sectionImageFile").value = "";
+            selectedSectionImageBase64 = "";
+            resetImagePreview("section", "Para hero, banners o bloques visuales.");
+        }
+
+        function saveSection() {
+            const section = {
+                id: document.getElementById("sectionId").value || crypto.randomUUID(),
+                sectionKey: document.getElementById("sectionKey").value,
+                title: document.getElementById("sectionTitle").value.trim(),
+                subtitle: document.getElementById("sectionSubtitle").value.trim(),
+                imageUrl: selectedSectionImageBase64 || document.getElementById("sectionImageUrl").value.trim(),
+                productId: document.getElementById("sectionProductId").value,
+                sortOrder: Number(document.getElementById("sectionSortOrder").value || sections.length + 1),
+                active: document.getElementById("sectionActive").value
+            };
+
+            const index = sections.findIndex(s => s.id === section.id);
+
+            if (index >= 0) sections[index] = section;
+            else sections.push(section);
+
+            renderAll();
+            sectionModal.hide();
+        }
+
+        function toggleSection(id) {
+            const s = sections.find(item => item.id === id);
+            if (!s) return;
+            s.active = s.active === "SI" ? "NO" : "SI";
+            renderSections();
+        }
+
+        function openGalleryModal() {
+            clearGalleryForm();
+            document.getElementById("galleryModalTitle").textContent = "Nueva imagen";
+            galleryModal.show();
+        }
+
+        function editGalleryItem(id) {
+            const g = gallery.find(item => item.id === id);
+            if (!g) return;
+
+            document.getElementById("galleryModalTitle").textContent = "Editar imagen";
+            document.getElementById("galleryId").value = g.id || "";
+            document.getElementById("galleryTitle").value = g.title || "";
+            document.getElementById("galleryCategory").value = g.category || "General";
+            document.getElementById("galleryImageUrl").value = g.imageUrl || "";
+            document.getElementById("gallerySortOrder").value = g.sortOrder || "";
+            document.getElementById("galleryActive").value = g.active || "SI";
+            selectedGalleryImageBase64 = "";
+
+            setImagePreview("gallery", g.imageUrl);
+            galleryModal.show();
+        }
+
+        function clearGalleryForm() {
+            document.getElementById("galleryId").value = "";
+            document.getElementById("galleryTitle").value = "";
+            document.getElementById("galleryCategory").value = "General";
+            document.getElementById("galleryImageUrl").value = "";
+            document.getElementById("gallerySortOrder").value = "";
+            document.getElementById("galleryActive").value = "SI";
+            document.getElementById("galleryImageFile").value = "";
+            selectedGalleryImageBase64 = "";
+            resetImagePreview("gallery", "Selecciona una imagen para galería.");
+        }
+
+        function saveGalleryItem() {
+            const item = {
+                id: document.getElementById("galleryId").value || crypto.randomUUID(),
+                title: document.getElementById("galleryTitle").value.trim(),
+                category: document.getElementById("galleryCategory").value,
+                imageUrl: selectedGalleryImageBase64 || document.getElementById("galleryImageUrl").value.trim(),
+                sortOrder: Number(document.getElementById("gallerySortOrder").value || gallery.length + 1),
+                active: document.getElementById("galleryActive").value
+            };
+
+            if (!item.title) {
+                alert("El título es obligatorio.");
+                return;
+            }
+
+            const index = gallery.findIndex(g => g.id === item.id);
+
+            if (index >= 0) gallery[index] = item;
+            else gallery.push(item);
+
+            renderGallery();
+            galleryModal.hide();
+        }
+
+        function toggleGalleryItem(id) {
+            const g = gallery.find(item => item.id === id);
+            if (!g) return;
+            g.active = g.active === "SI" ? "NO" : "SI";
+            renderGallery();
+        }
+
+        function saveSettings() {
+            settings = {
+                businessName: document.getElementById("settingBusinessName").value.trim(),
+                whatsapp: document.getElementById("settingWhatsapp").value.trim(),
+                address: document.getElementById("settingAddress").value.trim(),
+                hours: document.getElementById("settingHours").value.trim(),
+                heroTitle: document.getElementById("settingHeroTitle").value.trim(),
+                heroSubtitle: document.getElementById("settingHeroSubtitle").value.trim(),
+                heroButton: document.getElementById("settingHeroButton").value.trim(),
+                social: document.getElementById("settingSocial").value.trim()
+            };
+
+            alert("Configuración guardada en modo demo.");
+
+            /*
+            // CÓDIGO REAL PARA DESPUÉS
+            apiRequest({
+              action: "saveSettings",
+              token: sessionStorage.getItem("flor_admin_token"),
+              deviceId: getDeviceId(),
+              settings
+            });
+            */
+        }
+
+        function handleImageFile(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith("image/")) {
+                alert("Selecciona un archivo de imagen.");
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                if (type === "product") {
+                    selectedProductImageBase64 = e.target.result;
+                    document.getElementById("productImageUrl").value = "";
+                }
+
+                if (type === "section") {
+                    selectedSectionImageBase64 = e.target.result;
+                    document.getElementById("sectionImageUrl").value = "";
+                }
+
+                if (type === "gallery") {
+                    selectedGalleryImageBase64 = e.target.result;
+                    document.getElementById("galleryImageUrl").value = "";
+                }
+
+                setImagePreview(type, e.target.result);
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        function previewImageUrl(type) {
+            const inputId = `${type}ImageUrl`;
+            const url = document.getElementById(inputId).value.trim();
+
+            if (type === "product") {
+                selectedProductImageBase64 = "";
+                document.getElementById("productImageFile").value = "";
+            }
+
+            if (type === "section") {
+                selectedSectionImageBase64 = "";
+                document.getElementById("sectionImageFile").value = "";
+            }
+
+            if (type === "gallery") {
+                selectedGalleryImageBase64 = "";
+                document.getElementById("galleryImageFile").value = "";
+            }
+
+            if (!url) {
+                resetImagePreview(type, "Selecciona una imagen.");
+                return;
+            }
+
+            setImagePreview(type, convertDriveUrl(url));
+        }
+
+        function setImagePreview(type, src) {
+            const previewId = `${type}ImagePreview`;
+
+            if (!src) {
+                resetImagePreview(type, "Selecciona una imagen.");
+                return;
+            }
+
+            document.getElementById(previewId).innerHTML = `
+        <img src="${convertDriveUrl(src)}" onerror="this.parentElement.innerHTML='<p class=&quot;small-muted mb-0&quot;>No se pudo cargar la imagen.</p>'">
+      `;
+        }
+
+        function resetImagePreview(type, text) {
+            const previewId = `${type}ImagePreview`;
+
+            document.getElementById(previewId).innerHTML = `
+        <i class="bi bi-cloud-arrow-up upload-icon"></i>
+        <h5 class="mt-3 mb-1">Cargar imagen</h5>
+        <p class="small-muted mb-0">${text}</p>
+      `;
+        }
+
+        function sectionLabel(key) {
+            const labels = {
+                hero: "Hero / portada",
+                destacados: "Productos destacados",
+                momentos: "Momentos especiales",
+                servicios: "Servicios",
+                catalogo: "Catálogo principal",
+                novias: "Ramos de novia",
+                temporada: "Temporada",
+                promociones: "Promociones"
+            };
+
+            return labels[key] || key;
+        }
+
+        function escapeHtml(text) {
+            return String(text)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+    </script>
+</body>
+
+</html>
