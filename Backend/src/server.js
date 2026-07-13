@@ -4,38 +4,57 @@ require('dotenv').config({
     path: path.resolve(__dirname, '../.env')
 });
 
-console.log(process.env.DB_HOST);
-console.log(process.env.DB_NAME);
-console.log(process.env.DB_USER);
-
+const app = require('./app');
 const sequelize = require('./config/database');
 
-async function testDatabaseConnection() {
+const PORT = Number(process.env.PORT || 3000);
+
+async function startServer() {
     try {
         await sequelize.authenticate();
 
         console.log('✅ Conexión con MySQL establecida correctamente.');
         console.log(`✅ Base configurada: ${process.env.DB_NAME}`);
 
-        const [result] = await sequelize.query(
-            'SELECT DATABASE() AS databaseName, NOW() AS serverTime'
-        );
-
-        console.log('✅ Base activa:', result[0].databaseName);
-        console.log('✅ Hora del servidor:', result[0].serverTime);
+        app.listen(PORT, () => {
+            console.log(`✅ API ejecutándose en el puerto ${PORT}`);
+            console.log(
+                `✅ Health check: http://localhost:${PORT}/api/health`
+            );
+            console.log(
+                `✅ Database check: http://localhost:${PORT}/api/health/database`
+            );
+        });
     } catch (error) {
-        console.error('❌ No fue posible conectar con MySQL.');
+        console.error('❌ No fue posible iniciar la API.');
         console.error('Tipo:', error.name);
         console.error('Mensaje:', error.message);
 
         if (error.original?.code) {
-            console.error('Código MySQL:', error.original.code);
+            console.error(
+                'Código MySQL:',
+                error.original.code
+            );
         }
 
-        process.exitCode = 1;
-    } finally {
-        await sequelize.close();
+        process.exit(1);
     }
 }
 
-testDatabaseConnection();
+async function shutdown(signal) {
+    console.log(`\n${signal} recibido. Cerrando servidor...`);
+
+    try {
+        await sequelize.close();
+        console.log('✅ Pool de MySQL cerrado correctamente.');
+        process.exit(0);
+    } catch (error) {
+        console.error('Error cerrando MySQL:', error.message);
+        process.exit(1);
+    }
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+
+startServer();
