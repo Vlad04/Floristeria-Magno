@@ -9,6 +9,13 @@ const productosRoutes = require('./routes/productos.routes');
 
 const app = express();
 
+/*
+ * Hostinger ejecuta la aplicación detrás de un proxy inverso.
+ * Confiamos en un salto de proxy para obtener correctamente
+ * la IP real del visitante desde X-Forwarded-For.
+ */
+app.set('trust proxy', 1);
+
 app.disable('x-powered-by');
 
 app.use(
