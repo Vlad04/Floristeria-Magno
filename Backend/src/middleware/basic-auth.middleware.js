@@ -1,66 +1,121 @@
 const bcrypt = require('bcryptjs');
 
+function requestCredentials(res, message) {
+    res.setHeader(
+        'WWW-Authenticate',
+        'Basic realm="ListoEnLinea API", charset="UTF-8"'
+    );
+
+    return res.status(401).json({
+        ok: false,
+        message
+    });
+}
+
 async function basicAuth(req, res, next) {
     const authorizationHeader = req.headers.authorization;
 
     if (!authorizationHeader?.startsWith('Basic ')) {
-        res.setHeader(
-            'WWW-Authenticate',
-            'Basic realm="ListoEnLinea API", charset="UTF-8"'
+        return requestCredentials(
+            res,
+            'Autenticación requerida'
         );
-
-        return res.status(401).json({
-            ok: false,
-            message: 'Autenticación requerida'
-        });
     }
 
     try {
-        const encodedCredentials = authorizationHeader.slice(6);
+        const adminEmail = process.env.ADMIN_EMAIL?.trim();
+        const adminPasswordHash =
+            process.env.ADMIN_PASSWORD_HASH?.trim();
+
+        if (!adminEmail || !adminPasswordHash) {
+            console.error(
+                'Basic Auth sin configurar:',
+                {
+                    hasAdminEmail: Boolean(adminEmail),
+                    hasPasswordHash: Boolean(adminPasswordHash)
+                }
+            );
+
+            return res.status(500).json({
+                ok: false,
+                message:
+                    'La autenticación del servidor no está configurada'
+            });
+        }
+
+        /*
+         * Un hash bcrypt normalmente mide 60 caracteres.
+         * No imprimimos el valor completo por seguridad.
+         */
+        console.log('Configuración Basic Auth:', {
+            adminEmail,
+            hashLength: adminPasswordHash.length,
+            hashPrefix: adminPasswordHash.slice(0, 7)
+        });
+
+        const encodedCredentials =
+            authorizationHeader.slice(6).trim();
 
         const decodedCredentials = Buffer
             .from(encodedCredentials, 'base64')
             .toString('utf8');
 
-        const separatorIndex = decodedCredentials.indexOf(':');
+        const separatorIndex =
+            decodedCredentials.indexOf(':');
 
         if (separatorIndex === -1) {
-            throw new Error('Credenciales inválidas');
+            return requestCredentials(
+                res,
+                'Credenciales inválidas'
+            );
         }
 
-        const email = decodedCredentials.slice(0, separatorIndex);
-        const password = decodedCredentials.slice(separatorIndex + 1);
+        const email = decodedCredentials
+            .slice(0, separatorIndex)
+            .trim();
+
+        /*
+         * No aplicamos trim a la contraseña porque los espacios
+         * podrían formar parte legítima de ella.
+         */
+        const password =
+            decodedCredentials.slice(separatorIndex + 1);
 
         const validEmail =
-            email.trim().toLowerCase() ===
-            process.env.ADMIN_EMAIL.trim().toLowerCase();
+            email.toLowerCase() === adminEmail.toLowerCase();
 
         const validPassword = await bcrypt.compare(
             password,
-            process.env.ADMIN_PASSWORD_HASH
+            adminPasswordHash
         );
 
-        if (!validEmail || !validPassword) {
-            res.setHeader(
-                'WWW-Authenticate',
-                'Basic realm="ListoEnLinea API", charset="UTF-8"'
-            );
+        /*
+         * Estos logs no exponen ni la contraseña ni el hash.
+         * Elimínalos cuando termines de diagnosticar.
+         */
+        console.log('Resultado Basic Auth:', {
+            receivedEmail: email,
+            validEmail,
+            validPassword,
+            passwordLength: password.length
+        });
 
-            return res.status(401).json({
-                ok: false,
-                message: 'Credenciales incorrectas'
-            });
+        if (!validEmail || !validPassword) {
+            return requestCredentials(
+                res,
+                'Credenciales incorrectas'
+            );
         }
 
         req.user = {
-            email: process.env.ADMIN_EMAIL,
+            email: adminEmail,
             role: 'admin',
             tenant: 'floristeria-magno'
         };
 
-        next();
+        return next();
     } catch (error) {
-        next(error);
+        return next(error);
     }
 }
 
