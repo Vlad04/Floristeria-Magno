@@ -1,8 +1,8 @@
 const express = require('express');
 
 const {
-    authenticateToken
-} = require('../middleware/auth.middleware');
+    basicAuth
+} = require('../middleware/basic-auth.middleware');
 
 const {
     listarProductos,
@@ -11,7 +11,7 @@ const {
 
 const router = express.Router();
 
-router.use(authenticateToken);
+router.use(basicAuth);
 router.get('/', listarProductos);
 router.get('/:id', obtenerProducto);
 
