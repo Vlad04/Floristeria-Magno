@@ -1,124 +1,126 @@
 const bcrypt = require('bcryptjs');
 
-function requestCredentials(res, message) {
-    res.setHeader(
-        'WWW-Authenticate',
-        'Basic realm="ListoEnLinea API", charset="UTF-8"'
-    );
-
-    return res.status(401).json({
-        ok: false,
-        message
-    });
-}
-
 async function basicAuth(req, res, next) {
     const authorizationHeader = req.headers.authorization;
 
     if (!authorizationHeader?.startsWith('Basic ')) {
-        return requestCredentials(
-            res,
-            'Autenticación requerida'
+        res.setHeader(
+            'WWW-Authenticate',
+            'Basic realm="ListoEnLinea API", charset="UTF-8"'
         );
+
+        return res.status(401).json({
+            ok: false,
+            message: 'Autenticación requerida'
+        });
     }
 
     try {
-        const adminEmail = process.env.ADMIN_EMAIL?.trim();
-        const adminPasswordHash =
-            process.env.ADMIN_PASSWORD_HASH?.trim();
-
-        if (!adminEmail || !adminPasswordHash) {
-            console.error(
-                'Basic Auth sin configurar:',
-                {
-                    hasAdminEmail: Boolean(adminEmail),
-                    hasPasswordHash: Boolean(adminPasswordHash)
-                }
-            );
-
-            return res.status(500).json({
-                ok: false,
-                message:
-                    'La autenticación del servidor no está configurada'
-            });
-        }
+        const adminEmail = process.env.ADMIN_EMAIL
+            ?.trim()
+            .toLowerCase();
 
         /*
-         * Un hash bcrypt normalmente mide 60 caracteres.
-         * No imprimimos el valor completo por seguridad.
+         * Hostinger está agregando diagonales antes de los signos $:
+         *
+         * \$2b\$12\$...
+         *
+         * Esta sustitución recupera el hash bcrypt original:
+         *
+         * $2b$12$...
          */
-        console.log('Configuración Basic Auth:', {
-            adminEmail,
-            hashLength: adminPasswordHash.length,
-            hashPrefix: adminPasswordHash.slice(0, 7)
-        });
+        const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH
+            ?.trim()
+            .replace(/\\\$/g, '$');
 
-        const encodedCredentials =
-            authorizationHeader.slice(6).trim();
+        if (!adminEmail) {
+            throw new Error(
+                'Falta la variable de entorno ADMIN_EMAIL'
+            );
+        }
+
+        if (!adminPasswordHash) {
+            throw new Error(
+                'Falta la variable de entorno ADMIN_PASSWORD_HASH'
+            );
+        }
+
+        const encodedCredentials = authorizationHeader.slice(6);
 
         const decodedCredentials = Buffer
             .from(encodedCredentials, 'base64')
             .toString('utf8');
 
-        const separatorIndex =
-            decodedCredentials.indexOf(':');
+        const separatorIndex = decodedCredentials.indexOf(':');
 
         if (separatorIndex === -1) {
-            return requestCredentials(
-                res,
-                'Credenciales inválidas'
-            );
+            throw new Error('Formato de credenciales inválido');
         }
 
-        const email = decodedCredentials
+        const receivedEmail = decodedCredentials
             .slice(0, separatorIndex)
-            .trim();
+            .trim()
+            .toLowerCase();
 
-        /*
-         * No aplicamos trim a la contraseña porque los espacios
-         * podrían formar parte legítima de ella.
-         */
-        const password =
-            decodedCredentials.slice(separatorIndex + 1);
+        const receivedPassword = decodedCredentials.slice(
+            separatorIndex + 1
+        );
 
-        const validEmail =
-            email.toLowerCase() === adminEmail.toLowerCase();
+        const validEmail = receivedEmail === adminEmail;
 
         const validPassword = await bcrypt.compare(
-            password,
+            receivedPassword,
             adminPasswordHash
         );
 
-        /*
-         * Estos logs no exponen ni la contraseña ni el hash.
-         * Elimínalos cuando termines de diagnosticar.
-         */
-        console.log('Resultado Basic Auth:', {
-            receivedEmail: email,
-            validEmail,
-            validPassword,
-            passwordLength: password.length
-        });
+        console.log(
+            'Configuración Basic Auth:',
+            JSON.stringify({
+                adminEmail,
+                hashLength: adminPasswordHash.length,
+                hashPrefix: adminPasswordHash.slice(0, 7)
+            })
+        );
+
+        console.log(
+            'Resultado Basic Auth:',
+            JSON.stringify({
+                receivedEmail,
+                validEmail,
+                validPassword,
+                passwordLength: receivedPassword.length
+            })
+        );
 
         if (!validEmail || !validPassword) {
-            return requestCredentials(
-                res,
-                'Credenciales incorrectas'
+            res.setHeader(
+                'WWW-Authenticate',
+                'Basic realm="ListoEnLinea API", charset="UTF-8"'
             );
-        }
 
-        req.user = {
-            email: adminEmail,
-            role: 'admin',
-            tenant: 'floristeria-magno'
-        };
+            return res.status(401).json({
+                ok: false,
+                message: 'Usuario o contraseña incorrectos'
+            });
+        }
 
         return next();
     } catch (error) {
-        return next(error);
+        console.error(
+            'Error en Basic Auth:',
+            error.message
+        );
+
+        res.setHeader(
+            'WWW-Authenticate',
+            'Basic realm="ListoEnLinea API", charset="UTF-8"'
+        );
+
+        return res.status(401).json({
+            ok: false,
+            message: 'Credenciales inválidas'
+        });
     }
 }
 
-module.exports = {
-    basicAuth
-};
+module.exports = basicAuth;
