@@ -4,8 +4,14 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 const sequelize = require('./config/database');
+
 const authRoutes = require('./routes/auth.routes');
 const productosRoutes = require('./routes/productos.routes');
+const clientesRoutes = require('./routes/clientes.routes');
+const pedidosRoutes = require('./routes/pedidos.routes');
+const detallesPedidoRoutes = require(
+    './routes/detalles-pedido.routes'
+);
 
 const app = express();
 
@@ -139,12 +145,29 @@ app.get('/api/health/database', async (req, res, next) => {
  * Rutas de autenticación.
  */
 app.use('/api/auth', authRoutes);
+
+
 /*
  * Rutas funcionales.
  */
 app.use(
     '/api/floristeria-magno/productos',
     productosRoutes
+);
+
+app.use(
+    '/api/floristeria-magno/clientes',
+    clientesRoutes
+);
+
+app.use(
+    '/api/floristeria-magno/pedidos',
+    pedidosRoutes
+);
+
+app.use(
+    '/api/floristeria-magno/detalles-pedido',
+    detallesPedidoRoutes
 );
 
 
