@@ -1594,16 +1594,24 @@
             behavior: 'smooth'
           });
 
-          window.clearTimeout(clickReleaseTimer);
+let scrollStopTimer = null;
 
-          /*
-            Damos tiempo suficiente para que termine el smooth scroll.
-            Después liberamos el scroll spy.
-          */
-          clickReleaseTimer = window.setTimeout(() => {
-            clickedSectionId = null;
-            updateActiveSection();
-          }, 1200);
+window.addEventListener(
+  'scroll',
+  () => {
+    updateActiveSection();
+
+    window.clearTimeout(scrollStopTimer);
+
+    // Solo libera el botón seleccionado cuando el movimiento
+    // realmente se ha detenido.
+    scrollStopTimer = window.setTimeout(() => {
+      clickedSectionId = null;
+      updateActiveSection();
+    }, 180);
+  },
+  { passive: true }
+);
         });
       });
 
