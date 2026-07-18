@@ -12223,3 +12223,52 @@ body.page-admin .admin-gallery-empty p {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================
+   HERO - CARGA DE IMÁGENES DESDE API
+========================================================== */
+
+body.page-index .gallery-loading-state {
+    width: 100%;
+    height: 620px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: rgba(39, 21, 27, 0.65);
+    background:
+        linear-gradient(135deg,
+            #ffffff 0%,
+            #ffe8e8 55%,
+            #ffffff 100%);
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+body.page-index .gallery-loading-spinner {
+    width: 38px;
+    height: 38px;
+    border: 3px solid rgba(39, 21, 27, 0.12);
+    border-top-color: rgba(39, 21, 27, 0.72);
+    border-radius: 50%;
+    animation: gallerySpinnerRotation 0.8s linear infinite;
+}
+
+@keyframes gallerySpinnerRotation {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 991px) {
+    body.page-index .gallery-loading-state {
+        height: 520px;
+    }
+}
+
+@media (max-width: 575px) {
+    body.page-index .gallery-loading-state {
+        height: 440px;
+    }
+}
