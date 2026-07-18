@@ -85,7 +85,7 @@
             Arte floral contemporáneo en Guadalajara
           </div>
           <h1 class="hero-title home-title">
-            Elige tu arreglo y agenda tu entrega ya.
+            Elige tu arreglo y agenda tu entrega.
           </h1>
           <p class="hero-description home-description">
             Agrega productos al carrito, selecciona fecha y horario de entrega, y confirma tu pedido por WhatsApp con
@@ -1481,9 +1481,8 @@
 
       if (!sections.length) return;
 
-let clickedSectionId = null;
+      let clickedSectionId = null;
 let scrollStopTimer = null;
-
       function activateLink(sectionId) {
         sectionLinks.forEach(link => {
           const isActive = link.dataset.section === sectionId;
@@ -1563,38 +1562,38 @@ let scrollStopTimer = null;
         }
       }
 
-      sectionLinks.forEach(link => {
-        link.addEventListener('click', event => {
-          const sectionId = link.dataset.section;
-          const section = document.getElementById(sectionId);
+sectionLinks.forEach(link => {
+  link.addEventListener('click', event => {
+    const sectionId = link.dataset.section;
+    const section = document.getElementById(sectionId);
 
-          if (!section) return;
+    if (!section) return;
 
-          event.preventDefault();
+    event.preventDefault();
 
-          clickedSectionId = sectionId;
-          activateLink(sectionId);
+    clickedSectionId = sectionId;
+    activateLink(sectionId);
 
-          const navbarHeight = navbar.offsetHeight || 90;
+    const navbarHeight = navbar.offsetHeight || 90;
 
-          const targetPosition =
-            section.getBoundingClientRect().top +
-            window.scrollY -
-            navbarHeight -
-            12;
+    const targetPosition =
+      section.getBoundingClientRect().top +
+      window.scrollY -
+      navbarHeight -
+      12;
 
-          window.history.replaceState(
-            null,
-            '',
-            `#${sectionId}`
-          );
+    window.history.replaceState(
+      null,
+      '',
+      `#${sectionId}`
+    );
 
-          window.scrollTo({
-            top: Math.max(0, targetPosition),
-            behavior: 'smooth'
-          });
-
-let scrollStopTimer = null;
+    window.scrollTo({
+      top: Math.max(0, targetPosition),
+      behavior: 'smooth'
+    });
+  });
+});
 
 window.addEventListener(
   'scroll',
@@ -1603,8 +1602,6 @@ window.addEventListener(
 
     window.clearTimeout(scrollStopTimer);
 
-    // Solo libera el botón seleccionado cuando el movimiento
-    // realmente se ha detenido.
     scrollStopTimer = window.setTimeout(() => {
       clickedSectionId = null;
       updateActiveSection();
@@ -1612,15 +1609,6 @@ window.addEventListener(
   },
   { passive: true }
 );
-        });
-      });
-
-      window.addEventListener(
-        'scroll',
-        updateActiveSection,
-        { passive: true }
-      );
-
       window.addEventListener(
         'resize',
         updateActiveSection
