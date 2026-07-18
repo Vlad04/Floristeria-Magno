@@ -2,6 +2,7 @@ const Cliente = require('./Cliente');
 const Producto = require('./Producto');
 const Pedido = require('./Pedido');
 const DetallePedido = require('./DetallePedido');
+const Galeria = require('./Galeria');
 
 /*
  * clientes 1 ─── N pedidos
@@ -46,5 +47,6 @@ module.exports = {
     Cliente,
     Producto,
     Pedido,
-    DetallePedido
+    DetallePedido,
+    Galeria
 };

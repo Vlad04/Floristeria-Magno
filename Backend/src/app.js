@@ -12,6 +12,7 @@ const pedidosRoutes = require('./routes/pedidos.routes');
 const detallesPedidoRoutes = require(
     './routes/detalles-pedido.routes'
 );
+const galeriaRoutes = require('./routes/galeria.routes');
 
 const app = express();
 
@@ -170,6 +171,10 @@ app.use(
     detallesPedidoRoutes
 );
 
+app.use(
+    '/api/floristeria-magno/galeria',
+    galeriaRoutes
+);
 
 /*
  * 404 siempre después de las rutas.
