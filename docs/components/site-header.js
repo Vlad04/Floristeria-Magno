@@ -375,6 +375,9 @@ class SiteHeader extends HTMLElement {
       }))
       .filter((item) => item.section);
 
+    let isAutomaticScrolling = false;
+    let automaticScrollTimer = null;
+
     const scrollToSection = (section, updateHash = true) => {
       const targetTop =
         section.getBoundingClientRect().top +
@@ -398,22 +401,46 @@ class SiteHeader extends HTMLElement {
         if (!section) return;
 
         event.preventDefault();
+
+        isAutomaticScrolling = true;
         activateLink(link);
         closeMenu();
         scrollToSection(section);
+
+        window.clearTimeout(automaticScrollTimer);
+        automaticScrollTimer = window.setTimeout(() => {
+          isAutomaticScrolling = false;
+          activateLink(link);
+          this.handleSectionScroll();
+        }, 900);
       });
     });
 
-    this.handleSectionScroll = () => {
-      const marker = window.scrollY + header.offsetHeight + 90;
-      let activeItem = sections[0];
+this.handleSectionScroll = () => {
+  if (isAutomaticScrolling) return;
 
-      sections.forEach((item) => {
-        if (item.section.offsetTop <= marker) activeItem = item;
-      });
+  const scrollPosition =
+    window.scrollY +
+    header.offsetHeight +
+    20;
 
-      activateLink(activeItem?.link);
-    };
+  let activeItem = sections[0];
+
+  sections.forEach((item) => {
+    const sectionTop = item.section.offsetTop;
+    const sectionBottom =
+      sectionTop + item.section.offsetHeight;
+
+    if (
+      scrollPosition >= sectionTop &&
+      scrollPosition < sectionBottom
+    ) {
+      activeItem = item;
+    }
+  });
+
+  activateLink(activeItem?.link);
+};
 
     window.addEventListener('scroll', this.handleSectionScroll, { passive: true });
     window.addEventListener('resize', this.handleSectionScroll);
