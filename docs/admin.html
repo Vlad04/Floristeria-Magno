@@ -34,7 +34,9 @@
 
             <button class="btn-gold w-100" onclick="loginAdmin()">Entrar al panel</button>
 
-            <p class="small-muted mt-3 mb-0">Modo demo activo: entra sin validar servidor.</p>
+            <p class="small-muted mt-3 mb-0">
+                Acceso exclusivo para administración.
+            </p>
         </section>
 
         <section id="adminView" class="hidden">
@@ -57,13 +59,13 @@
             </div>
 
             <div class="tabs-card glass">
-                <button class="tab-btn active" onclick="setTab('products')">
+                <button class="tab-btn active" onclick="setTab('products', this)">
                     <i class="bi bi-flower1"></i> Catálogo
                 </button>
-                <button class="tab-btn" onclick="setTab('gallery')">
+                <button class="tab-btn" onclick="setTab('gallery', this)">
                     <i class="bi bi-images"></i> Galería
                 </button>
-                <button class="tab-btn" onclick="setTab('settings')">
+                <button class="tab-btn" onclick="setTab('settings', this)">
                     <i class="bi bi-gear"></i> Configuración
                 </button>
             </div>
@@ -507,6 +509,37 @@
                         </div>
                     </div>
 
+                    <div class="form-grid-2 mb-3">
+                        <div>
+                            <label>Sección de la página</label>
+
+                            <select id="gallerySection" class="form-select">
+                                <option value="hero">Hero / portada</option>
+                                <option value="momentos">Momentos</option>
+                                <option value="colecciones">Colecciones</option>
+                                <option value="historias">Historias</option>
+                                <option value="novias">Ramos de novia</option>
+                                <option value="social">Inspiración floral</option>
+                                <option value="ubicacion">Ubicación</option>
+                                <option value="otros">Otros</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label>Texto alternativo</label>
+
+                            <input id="galleryAltText" class="form-control"
+                                placeholder="Descripción accesible de la imagen">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Descripción</label>
+
+                        <textarea id="galleryDescription" class="form-control" rows="4"
+                            placeholder="Descripción relacionada con la imagen"></textarea>
+                    </div>
+
                     <div class="form-grid-2">
                         <div>
                             <label>Orden</label>
@@ -536,7 +569,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        const API_URL = "PEGA_AQUI_TU_URL_DE_APPS_SCRIPT";
+
+        const API_BASE_URL =
+            window.location.hostname === "localhost" ||
+                window.location.hostname === "127.0.0.1"
+                ? "http://localhost:3000/api/floristeria-magno"
+                : "https://api.listoenlinea.host/api/floristeria-magno";
 
         let products = [];
         let sections = [];
@@ -549,9 +587,7 @@
         let sectionModal;
         let galleryModal;
 
-        let selectedProductImageBase64 = "";
         let selectedSectionImageBase64 = "";
-        let selectedGalleryImageBase64 = "";
 
         document.addEventListener("DOMContentLoaded", () => {
             productModal = new bootstrap.Modal(document.getElementById("productModal"));
@@ -559,15 +595,69 @@
             galleryModal = new bootstrap.Modal(document.getElementById("galleryModal"));
         });
 
-        function getDeviceId() {
-            let id = localStorage.getItem("flor_admin_device_id");
+        function getBasicAuthorization() {
+            const encodedCredentials =
+                sessionStorage.getItem(
+                    "flor_admin_basic_auth"
+                );
 
-            if (!id) {
-                id = "device_" + crypto.randomUUID();
-                localStorage.setItem("flor_admin_device_id", id);
+            return encodedCredentials
+                ? `Basic ${encodedCredentials}`
+                : "";
+        }
+
+        async function apiFetch(path, options = {}) {
+            const headers = new Headers(
+                options.headers || {}
+            );
+
+            headers.set('Accept', 'application/json');
+
+            if (!(options.body instanceof FormData)) {
+                headers.set(
+                    'Content-Type',
+                    'application/json'
+                );
             }
 
-            return id;
+            const authorization =
+                getBasicAuthorization();
+
+            if (authorization) {
+                headers.set(
+                    'Authorization',
+                    authorization
+                );
+            }
+
+            const response = await fetch(
+                `${API_BASE_URL}${path}`,
+                {
+                    ...options,
+                    headers
+                }
+            );
+
+            let result;
+
+            try {
+                result = await response.json();
+            } catch {
+                result = {
+                    ok: false,
+                    message:
+                        'La API devolvió una respuesta inválida'
+                };
+            }
+
+            if (!response.ok || !result.ok) {
+                throw new Error(
+                    result.message ||
+                    `Error HTTP ${response.status}`
+                );
+            }
+
+            return result;
         }
 
         function convertDriveUrl(url) {
@@ -582,201 +672,172 @@
             return url;
         }
 
-        async function apiRequest(payload) {
-            const response = await fetch(API_URL, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            });
-
-            return await response.json();
-        }
-
-        /*
-        // LOGIN REAL PARA CUANDO CONECTEMOS GOOGLE APPS SCRIPT
         async function loginAdmin() {
-          const user = document.getElementById("loginUser").value.trim();
-          const password = document.getElementById("loginPass").value.trim();
-    
-          if (!user || !password) {
-            alert("Ingresa usuario y contraseña.");
-            return;
-          }
-    
-          try {
-            const result = await apiRequest({
-              action: "login",
-              user,
-              password,
-              deviceId: getDeviceId()
-            });
-    
-            if (!result.success) {
-              alert(result.message || "Acceso denegado.");
-              return;
+            const email = document
+                .getElementById("loginUser")
+                .value
+                .trim();
+
+            const password = document
+                .getElementById("loginPass")
+                .value;
+
+            if (!email || !password) {
+                alert("Ingresa usuario y contraseña.");
+                return;
             }
-    
-            sessionStorage.setItem("flor_admin_token", result.token);
-    
-            document.getElementById("loginView").classList.add("hidden");
-            document.getElementById("adminView").classList.remove("hidden");
-    
-            loadAllData();
-    
-          } catch (error) {
-            console.error(error);
-            alert("No se pudo conectar con el servidor.");
-          }
-        }
-        */
 
-        // BYPASS TEMPORAL: DEJA PASAR SIN VALIDAR SERVIDOR
-        async function loginAdmin() {
-            sessionStorage.setItem("flor_admin_token", "modo_desarrollo");
+            const encodedCredentials = btoa(
+                unescape(
+                    encodeURIComponent(
+                        `${email}:${password}`
+                    )
+                )
+            );
 
-            document.getElementById("loginView").classList.add("hidden");
-            document.getElementById("adminView").classList.remove("hidden");
+            sessionStorage.setItem(
+                "flor_admin_basic_auth",
+                encodedCredentials
+            );
 
-            loadDemoData();
-            renderAll();
+            try {
+                await apiFetch(
+                    "/productos/admin/todos"
+                );
+
+                document
+                    .getElementById("loginView")
+                    .classList
+                    .add("hidden");
+
+                document
+                    .getElementById("adminView")
+                    .classList
+                    .remove("hidden");
+
+                await loadAllData();
+            } catch (error) {
+                sessionStorage.removeItem(
+                    "flor_admin_basic_auth"
+                );
+
+                alert(error.message);
+            }
         }
 
         function logoutAdmin() {
-            sessionStorage.removeItem("flor_admin_token");
+            sessionStorage.removeItem(
+                "flor_admin_basic_auth"
+            );
+
             location.reload();
         }
+        async function loadAllData() {
+            try {
+                const [
+                    productResult,
+                    galleryResult
+                ] = await Promise.all([
+                    apiFetch(
+                        '/productos/admin/todos'
+                    ),
 
-        function loadDemoData() {
-            products = [
-                {
-                    id: "prod_001",
-                    name: "Ramo Rosas Premium",
-                    price: 899,
-                    stock: 5,
-                    category: "Ramos",
-                    tag: "Amor",
-                    description: "Rosas premium con follaje elegante, ideal para aniversarios o detalles especiales.",
-                    imageUrl: "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=900&q=80",
-                    active: "SI",
-                    featured: "SI",
-                    sortOrder: 1
-                },
-                {
-                    id: "prod_002",
-                    name: "Arreglo Elegance",
-                    price: 1299,
-                    stock: 3,
-                    category: "Arreglos",
-                    tag: "Elegante",
-                    description: "Arreglo floral de estilo fino para regalo, mesa principal o celebración especial.",
-                    imageUrl: "https://images.unsplash.com/photo-1563241527-3004b7be0ffd?auto=format&fit=crop&w=900&q=80",
-                    active: "SI",
-                    featured: "NO",
-                    sortOrder: 2
-                },
-                {
-                    id: "prod_003",
-                    name: "Ramo Primavera",
-                    price: 749,
-                    stock: 8,
-                    category: "Temporada",
-                    tag: "Colorido",
-                    description: "Ramo fresco con tonos suaves y flores de temporada.",
-                    imageUrl: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=900&q=80",
-                    active: "SI",
-                    featured: "SI",
-                    sortOrder: 3
-                }
-            ];
+                    apiFetch(
+                        '/galeria/admin/todas'
+                    )
+                ]);
 
-            sections = [
-                {
-                    id: "sec_001",
-                    sectionKey: "hero",
-                    title: "Arte floral para momentos inolvidables",
-                    subtitle: "Diseños florales contemporáneos para regalos, eventos y detalles especiales.",
-                    imageUrl: "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?auto=format&fit=crop&w=1200&q=80",
-                    productId: "",
-                    sortOrder: 1,
-                    active: "SI"
-                },
-                {
-                    id: "sec_002",
-                    sectionKey: "destacados",
-                    title: "Nuestros favoritos",
-                    subtitle: "Arreglos seleccionados por su elegancia, frescura y estilo.",
-                    imageUrl: "",
-                    productId: "prod_001",
-                    sortOrder: 1,
-                    active: "SI"
-                },
-                {
-                    id: "sec_003",
-                    sectionKey: "destacados",
-                    title: "Nuestros favoritos",
-                    subtitle: "Arreglos seleccionados por su elegancia, frescura y estilo.",
-                    imageUrl: "",
-                    productId: "prod_003",
-                    sortOrder: 2,
-                    active: "SI"
-                }
-            ];
+                products = productResult.data.map(
+                    product => ({
+                        id: String(product.id),
+                        name: product.nombre,
+                        description:
+                            product.descripcion || '',
+                        category:
+                            product.categoria || '',
+                        tag:
+                            product.etiqueta || '',
+                        price:
+                            Number(product.precio || 0),
+                        stock:
+                            Number(product.stock || 0),
+                        imageUrl:
+                            product.imagenUrl || '',
+                        featured:
+                            product.destacado
+                                ? 'SI'
+                                : 'NO',
+                        sortOrder:
+                            Number(product.orden || 0),
+                        active:
+                            product.activo
+                                ? 'SI'
+                                : 'NO'
+                    })
+                );
 
-            gallery = [
-                {
-                    id: "gal_001",
-                    title: "Mesa floral elegante",
-                    category: "Eventos",
-                    imageUrl: "https://images.unsplash.com/photo-1487070183336-b863922373d4?auto=format&fit=crop&w=900&q=80",
-                    sortOrder: 1,
-                    active: "SI"
-                },
-                {
-                    id: "gal_002",
-                    title: "Ramo romántico",
-                    category: "Ramos",
-                    imageUrl: "https://images.unsplash.com/photo-1457089328109-e5d9bd499191?auto=format&fit=crop&w=900&q=80",
-                    sortOrder: 2,
-                    active: "SI"
-                }
-            ];
+                gallery = galleryResult.data.map(
+                    item => ({
+                        id: String(item.id),
+                        title: item.titulo,
+                        description:
+                            item.descripcion || '',
+                        imageUrl:
+                            item.imagenUrl || '',
+                        altText:
+                            item.textoAlternativo || '',
+                        category:
+                            item.categoria || '',
+                        section:
+                            item.seccion || 'otros',
+                        sortOrder:
+                            Number(item.orden || 0),
+                        active:
+                            item.activo
+                                ? 'SI'
+                                : 'NO'
+                    })
+                );
 
-            settings = {
-                businessName: "Floristería Juan H Magno",
-                whatsapp: "+52 33 0000 0000",
-                address: "Guadalajara, Jalisco",
-                hours: "Lunes a sábado de 9:00 a 19:00",
-                heroTitle: "Arte floral para momentos inolvidables",
-                heroSubtitle: "Cada ramo es único y especial. Diseños florales con intención, belleza y frescura.",
-                heroButton: "Ver catálogo",
-                social: "@juanhmagno"
-            };
+                sections = [];
+                settings = {};
+
+                renderAll();
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+            }
         }
 
-        async function loadAllData() {
-            renderAll();
-
-            /*
-            // CÓDIGO REAL PARA DESPUÉS CON APPS SCRIPT
-            const token = sessionStorage.getItem("flor_admin_token");
-      
-            const result = await apiRequest({
-              action: "getAll",
-              token,
-              deviceId: getDeviceId()
-            });
-      
-            if (!result.success) {
-              alert(result.message || "No se pudo cargar la información.");
-              return;
+        async function uploadSelectedImage(
+            file,
+            type
+        ) {
+            if (!file) {
+                return '';
             }
-      
-            products = result.products || [];
-            sections = result.sections || [];
-            gallery = result.gallery || [];
-            settings = result.settings || {};
-      
-            renderAll();
-            */
+
+            const formData = new FormData();
+
+            formData.append(
+                'imagen',
+                file
+            );
+
+            const endpoint =
+                type === 'product'
+                    ? '/uploads/producto'
+                    : '/uploads/galeria';
+
+            const result = await apiFetch(
+                endpoint,
+                {
+                    method: 'POST',
+                    body: formData
+                }
+            );
+
+            return result.data.imagenUrl;
         }
 
         function renderAll() {
@@ -787,11 +848,16 @@
             fillProductOptions();
         }
 
-        function setTab(tab) {
+        function setTab(tab, clickedButton) {
             currentTab = tab;
 
-            document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-            event.currentTarget.classList.add("active");
+            document
+                .querySelectorAll(".tab-btn")
+                .forEach(button => {
+                    button.classList.remove("active");
+                });
+
+            clickedButton.classList.add("active");
 
             document.getElementById("tabProducts").classList.toggle("hidden", tab !== "products");
             document.getElementById("tabSections").classList.toggle("hidden", tab !== "sections");
@@ -1269,7 +1335,6 @@
             document.getElementById("productActive").value = p.active || "SI";
             document.getElementById("productFeatured").value = p.featured || "NO";
             document.getElementById("productSortOrder").value = p.sortOrder || "";
-            selectedProductImageBase64 = "";
 
             setImagePreview("product", p.imageUrl);
             productModal.show();
@@ -1288,44 +1353,152 @@
             document.getElementById("productFeatured").value = "NO";
             document.getElementById("productSortOrder").value = "";
             document.getElementById("productImageFile").value = "";
-            selectedProductImageBase64 = "";
             resetImagePreview("product", "Selecciona una foto desde la computadora o celular.");
         }
 
-        function saveProduct() {
-            const product = {
-                id: document.getElementById("productId").value || crypto.randomUUID(),
-                name: document.getElementById("productName").value.trim(),
-                price: Number(document.getElementById("productPrice").value || 0),
-                stock: Number(document.getElementById("productStock").value || 0),
-                category: document.getElementById("productCategory").value,
-                tag: document.getElementById("productTag").value.trim(),
-                description: document.getElementById("productDescription").value.trim(),
-                imageUrl: selectedProductImageBase64 || document.getElementById("productImageUrl").value.trim(),
-                active: document.getElementById("productActive").value,
-                featured: document.getElementById("productFeatured").value,
-                sortOrder: Number(document.getElementById("productSortOrder").value || products.length + 1)
-            };
+        async function saveProduct() {
+            const button = document.querySelector(
+                '#productModal .modal-footer .btn-gold'
+            );
 
-            if (!product.name || !product.price) {
-                alert("Nombre y precio son obligatorios.");
+            try {
+                button.disabled = true;
+                button.innerHTML =
+                    '<span class="spinner-border spinner-border-sm"></span> Guardando...';
+
+                const id = document
+                    .getElementById('productId')
+                    .value;
+
+                const currentProduct = products.find(
+                    item => item.id === id
+                );
+
+                const selectedFile = document
+                    .getElementById('productImageFile')
+                    .files[0];
+
+                let imageUrl = document
+                    .getElementById('productImageUrl')
+                    .value
+                    .trim();
+
+                if (!imageUrl && currentProduct) {
+                    imageUrl = currentProduct.imageUrl;
+                }
+
+                if (selectedFile) {
+                    imageUrl = await uploadSelectedImage(
+                        selectedFile,
+                        'product'
+                    );
+                }
+
+                const payload = {
+                    nombre: document
+                        .getElementById('productName')
+                        .value
+                        .trim(),
+
+                    descripcion: document
+                        .getElementById('productDescription')
+                        .value
+                        .trim(),
+
+                    categoria: document
+                        .getElementById('productCategory')
+                        .value,
+
+                    etiqueta: document
+                        .getElementById('productTag')
+                        .value
+                        .trim(),
+
+                    precio: Number(
+                        document
+                            .getElementById('productPrice')
+                            .value
+                    ),
+
+                    stock: Number(
+                        document
+                            .getElementById('productStock')
+                            .value
+                    ),
+
+                    imagenUrl: imageUrl,
+
+                    destacado:
+                        document
+                            .getElementById('productFeatured')
+                            .value === 'SI',
+
+                    orden: Number(
+                        document
+                            .getElementById('productSortOrder')
+                            .value || 1
+                    ),
+
+                    activo:
+                        document
+                            .getElementById('productActive')
+                            .value === 'SI'
+                };
+
+                const path = id
+                    ? `/productos/${id}`
+                    : '/productos';
+
+                await apiFetch(path, {
+                    method: id ? 'PUT' : 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                productModal.hide();
+
+                await loadAllData();
+
+                alert(
+                    id
+                        ? 'Producto actualizado.'
+                        : 'Producto creado.'
+                );
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+            } finally {
+                button.disabled = false;
+                button.innerHTML =
+                    '<i class="bi bi-save"></i> Guardar producto';
+            }
+        }
+
+        async function toggleProduct(id) {
+            const product = products.find(
+                item => item.id === String(id)
+            );
+
+            if (!product) {
                 return;
             }
 
-            const index = products.findIndex(p => p.id === product.id);
+            try {
+                await apiFetch(
+                    `/productos/${id}/estado`,
+                    {
+                        method: 'PATCH',
+                        body: JSON.stringify({
+                            activo:
+                                product.active !== 'SI'
+                        })
+                    }
+                );
 
-            if (index >= 0) products[index] = product;
-            else products.push(product);
-
-            renderAll();
-            productModal.hide();
-        }
-
-        function toggleProduct(id) {
-            const p = products.find(item => item.id === id);
-            if (!p) return;
-            p.active = p.active === "SI" ? "NO" : "SI";
-            renderAll();
+                await loadAllData();
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+            }
         }
 
         function openSectionModal() {
@@ -1405,19 +1578,53 @@
         }
 
         function editGalleryItem(id) {
-            const g = gallery.find(item => item.id === id);
-            if (!g) return;
+            const g = gallery.find(
+                item => item.id === id
+            );
 
-            document.getElementById("galleryModalTitle").textContent = "Editar imagen";
-            document.getElementById("galleryId").value = g.id || "";
-            document.getElementById("galleryTitle").value = g.title || "";
-            document.getElementById("galleryCategory").value = g.category || "General";
-            document.getElementById("galleryImageUrl").value = g.imageUrl || "";
-            document.getElementById("gallerySortOrder").value = g.sortOrder || "";
-            document.getElementById("galleryActive").value = g.active || "SI";
-            selectedGalleryImageBase64 = "";
+            if (!g) {
+                return;
+            }
 
-            setImagePreview("gallery", g.imageUrl);
+            document
+                .getElementById("galleryModalTitle")
+                .textContent = "Editar imagen";
+
+            document.getElementById("galleryId").value =
+                g.id || "";
+
+            document.getElementById("galleryTitle").value =
+                g.title || "";
+
+            document.getElementById("galleryCategory").value =
+                g.category || "General";
+
+            document.getElementById("galleryImageUrl").value =
+                g.imageUrl || "";
+
+            document.getElementById("gallerySortOrder").value =
+                g.sortOrder || "";
+
+            document.getElementById("galleryActive").value =
+                g.active || "SI";
+
+            document.getElementById("galleryDescription").value =
+                g.description || "";
+
+            document.getElementById("galleryAltText").value =
+                g.altText || "";
+
+            document.getElementById("gallerySection").value =
+                g.section || "otros";
+
+            document.getElementById("galleryImageFile").value =
+                "";
+
+            setImagePreview(
+                "gallery",
+                g.imageUrl
+            );
+
             galleryModal.show();
         }
 
@@ -1429,39 +1636,150 @@
             document.getElementById("gallerySortOrder").value = "";
             document.getElementById("galleryActive").value = "SI";
             document.getElementById("galleryImageFile").value = "";
-            selectedGalleryImageBase64 = "";
+            document
+                .getElementById('galleryDescription')
+                .value = '';
+
+            document
+                .getElementById('galleryAltText')
+                .value = '';
+
+            document
+                .getElementById('gallerySection')
+                .value = 'hero';
             resetImagePreview("gallery", "Selecciona una imagen para galería.");
         }
 
-        function saveGalleryItem() {
-            const item = {
-                id: document.getElementById("galleryId").value || crypto.randomUUID(),
-                title: document.getElementById("galleryTitle").value.trim(),
-                category: document.getElementById("galleryCategory").value,
-                imageUrl: selectedGalleryImageBase64 || document.getElementById("galleryImageUrl").value.trim(),
-                sortOrder: Number(document.getElementById("gallerySortOrder").value || gallery.length + 1),
-                active: document.getElementById("galleryActive").value
-            };
+        async function saveGalleryItem() {
+            const button = document.querySelector(
+                '#galleryModal .modal-footer .btn-gold'
+            );
 
-            if (!item.title) {
-                alert("El título es obligatorio.");
+            try {
+                button.disabled = true;
+                button.innerHTML =
+                    '<span class="spinner-border spinner-border-sm"></span> Guardando...';
+
+                const id = document
+                    .getElementById('galleryId')
+                    .value;
+
+                const currentItem = gallery.find(
+                    item => item.id === id
+                );
+
+                const selectedFile = document
+                    .getElementById('galleryImageFile')
+                    .files[0];
+
+                let imageUrl = document
+                    .getElementById('galleryImageUrl')
+                    .value
+                    .trim();
+
+                if (!imageUrl && currentItem) {
+                    imageUrl = currentItem.imageUrl;
+                }
+
+                if (selectedFile) {
+                    imageUrl = await uploadSelectedImage(
+                        selectedFile,
+                        'gallery'
+                    );
+                }
+
+                const payload = {
+                    titulo: document
+                        .getElementById('galleryTitle')
+                        .value
+                        .trim(),
+
+                    descripcion: document
+                        .getElementById('galleryDescription')
+                        .value
+                        .trim(),
+
+                    imagenUrl: imageUrl,
+
+                    textoAlternativo: document
+                        .getElementById('galleryAltText')
+                        .value
+                        .trim(),
+
+                    categoria: document
+                        .getElementById('galleryCategory')
+                        .value,
+
+                    seccion: document
+                        .getElementById('gallerySection')
+                        .value,
+
+                    orden: Number(
+                        document
+                            .getElementById('gallerySortOrder')
+                            .value || 1
+                    ),
+
+                    activo:
+                        document
+                            .getElementById('galleryActive')
+                            .value === 'SI'
+                };
+
+                const path = id
+                    ? `/galeria/${id}`
+                    : '/galeria';
+
+                await apiFetch(path, {
+                    method: id ? 'PUT' : 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                galleryModal.hide();
+
+                await loadAllData();
+
+                alert(
+                    id
+                        ? 'Imagen actualizada.'
+                        : 'Imagen creada.'
+                );
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+            } finally {
+                button.disabled = false;
+                button.innerHTML =
+                    '<i class="bi bi-save"></i> Guardar imagen';
+            }
+        }
+
+        async function toggleGalleryItem(id) {
+            const item = gallery.find(
+                image => image.id === String(id)
+            );
+
+            if (!item) {
                 return;
             }
 
-            const index = gallery.findIndex(g => g.id === item.id);
+            try {
+                await apiFetch(
+                    `/galeria/${id}/estado`,
+                    {
+                        method: 'PATCH',
+                        body: JSON.stringify({
+                            activo:
+                                item.active !== 'SI'
+                        })
+                    }
+                );
 
-            if (index >= 0) gallery[index] = item;
-            else gallery.push(item);
-
-            renderGallery();
-            galleryModal.hide();
-        }
-
-        function toggleGalleryItem(id) {
-            const g = gallery.find(item => item.id === id);
-            if (!g) return;
-            g.active = g.active === "SI" ? "NO" : "SI";
-            renderGallery();
+                await loadAllData();
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+            }
         }
 
         function saveSettings() {
@@ -1491,35 +1809,31 @@
 
         function handleImageFile(event, type) {
             const file = event.target.files[0];
-            if (!file) return;
 
-            if (!file.type.startsWith("image/")) {
-                alert("Selecciona un archivo de imagen.");
+            if (!file) {
                 return;
             }
 
-            const reader = new FileReader();
+            if (!file.type.startsWith("image/")) {
+                alert("Selecciona un archivo de imagen.");
+                event.target.value = "";
+                return;
+            }
 
-            reader.onload = function (e) {
-                if (type === "product") {
-                    selectedProductImageBase64 = e.target.result;
-                    document.getElementById("productImageUrl").value = "";
-                }
+            const maxSize = 8 * 1024 * 1024;
 
-                if (type === "section") {
-                    selectedSectionImageBase64 = e.target.result;
-                    document.getElementById("sectionImageUrl").value = "";
-                }
+            if (file.size > maxSize) {
+                alert("La imagen no puede pesar más de 8 MB.");
+                event.target.value = "";
+                return;
+            }
 
-                if (type === "gallery") {
-                    selectedGalleryImageBase64 = e.target.result;
-                    document.getElementById("galleryImageUrl").value = "";
-                }
+            const previewUrl = URL.createObjectURL(file);
 
-                setImagePreview(type, e.target.result);
-            };
-
-            reader.readAsDataURL(file);
+            setImagePreview(
+                type,
+                previewUrl
+            );
         }
 
         function previewImageUrl(type) {
@@ -1527,7 +1841,6 @@
             const url = document.getElementById(inputId).value.trim();
 
             if (type === "product") {
-                selectedProductImageBase64 = "";
                 document.getElementById("productImageFile").value = "";
             }
 
@@ -1537,7 +1850,6 @@
             }
 
             if (type === "gallery") {
-                selectedGalleryImageBase64 = "";
                 document.getElementById("galleryImageFile").value = "";
             }
 

@@ -2,19 +2,60 @@ const express = require('express');
 
 const {
     listarProductos,
-    obtenerProducto
+    obtenerProducto,
+    crearProducto,
+    actualizarProducto,
+    cambiarEstadoProducto
 } = require('../controllers/productos.controller');
 
-const basicAuth = require('../middleware/basic-auth.middleware');
+const basicAuth = require(
+    '../middleware/basic-auth.middleware'
+);
 
 const router = express.Router();
 
-/*
- * Protege todas las rutas declaradas después de esta línea.
- */
-router.use(basicAuth);
+function allowInactive(req, res, next) {
+    req.allowInactive = true;
+    next();
+}
 
+/*
+ * Rutas públicas.
+ */
 router.get('/', listarProductos);
+
+/*
+ * Ruta administrativa.
+ * Debe estar antes de /:id.
+ */
+router.get(
+    '/admin/todos',
+    basicAuth,
+    allowInactive,
+    listarProductos
+);
+
 router.get('/:id', obtenerProducto);
+
+/*
+ * Rutas administrativas.
+ */
+router.post(
+    '/',
+    basicAuth,
+    crearProducto
+);
+
+router.put(
+    '/:id',
+    basicAuth,
+    actualizarProducto
+);
+
+router.patch(
+    '/:id/estado',
+    basicAuth,
+    cambiarEstadoProducto
+);
 
 module.exports = router;

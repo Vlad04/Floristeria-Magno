@@ -1,27 +1,127 @@
 const { Op } = require('sequelize');
 const { Galeria } = require('../models');
 
+const attributes = [
+    'id',
+    'titulo',
+    'descripcion',
+    'imagenUrl',
+    'textoAlternativo',
+    'categoria',
+    'seccion',
+    'orden',
+    'activo',
+    'creadoEn',
+    'actualizadoEn'
+];
+
+function normalizeBoolean(value, defaultValue = false) {
+    if (typeof value === 'boolean') {
+        return value;
+    }
+
+    if (value === 1 || value === '1') {
+        return true;
+    }
+
+    if (value === 0 || value === '0') {
+        return false;
+    }
+
+    if (typeof value === 'string') {
+        const normalized = value
+            .trim()
+            .toLowerCase();
+
+        if (['true', 'si', 'sí'].includes(normalized)) {
+            return true;
+        }
+
+        if (['false', 'no'].includes(normalized)) {
+            return false;
+        }
+    }
+
+    return defaultValue;
+}
+
+function validateBody(body) {
+    if (!String(body.titulo || '').trim()) {
+        return 'El título es obligatorio';
+    }
+
+    if (!String(body.imagenUrl || '').trim()) {
+        return 'La imagen es obligatoria';
+    }
+
+    if (!String(body.seccion || '').trim()) {
+        return 'La sección es obligatoria';
+    }
+
+    const orden = Number(body.orden ?? 1);
+
+    if (!Number.isInteger(orden) || orden < 0) {
+        return 'El orden no es válido';
+    }
+
+    return null;
+}
+
+function buildPayload(body) {
+    return {
+        titulo: String(body.titulo || '').trim(),
+
+        descripcion: body.descripcion
+            ? String(body.descripcion).trim()
+            : null,
+
+        imagenUrl: String(
+            body.imagenUrl || ''
+        ).trim(),
+
+        textoAlternativo: body.textoAlternativo
+            ? String(body.textoAlternativo).trim()
+            : null,
+
+        categoria: body.categoria
+            ? String(body.categoria).trim()
+            : null,
+
+        seccion: String(
+            body.seccion || 'otros'
+        )
+            .trim()
+            .toLowerCase(),
+
+        orden: Number(body.orden ?? 1),
+
+        activo: normalizeBoolean(
+            body.activo,
+            true
+        ),
+
+        actualizadoEn: new Date()
+    };
+}
+
 async function listarGaleria(req, res, next) {
     try {
         const {
             seccion,
             categoria,
-            buscar,
-            incluirInactivas
+            buscar
         } = req.query;
 
         const where = {};
 
-        /*
-         * Por defecto, el frontend público únicamente
-         * recibe imágenes activas.
-         */
-        if (incluirInactivas !== 'true') {
+        if (req.allowInactive !== true) {
             where.activo = true;
         }
 
         if (seccion && seccion.trim()) {
-            where.seccion = seccion.trim().toLowerCase();
+            where.seccion = seccion
+                .trim()
+                .toLowerCase();
         }
 
         if (categoria && categoria.trim()) {
@@ -29,27 +129,27 @@ async function listarGaleria(req, res, next) {
         }
 
         if (buscar && buscar.trim()) {
-            const textoBusqueda = buscar.trim();
+            const text = buscar.trim();
 
             where[Op.or] = [
                 {
                     titulo: {
-                        [Op.like]: `%${textoBusqueda}%`
+                        [Op.like]: `%${text}%`
                     }
                 },
                 {
                     descripcion: {
-                        [Op.like]: `%${textoBusqueda}%`
+                        [Op.like]: `%${text}%`
                     }
                 },
                 {
                     categoria: {
-                        [Op.like]: `%${textoBusqueda}%`
+                        [Op.like]: `%${text}%`
                     }
                 },
                 {
                     seccion: {
-                        [Op.like]: `%${textoBusqueda}%`
+                        [Op.like]: `%${text}%`
                     }
                 }
             ];
@@ -57,19 +157,7 @@ async function listarGaleria(req, res, next) {
 
         const imagenes = await Galeria.findAll({
             where,
-            attributes: [
-                'id',
-                'titulo',
-                'descripcion',
-                'imagenUrl',
-                'textoAlternativo',
-                'categoria',
-                'seccion',
-                'orden',
-                'activo',
-                'creadoEn',
-                'actualizadoEn'
-            ],
+            attributes,
             order: [
                 ['seccion', 'ASC'],
                 ['orden', 'ASC'],
@@ -91,33 +179,14 @@ async function obtenerImagenGaleria(req, res, next) {
     try {
         const id = Number(req.params.id);
 
-        if (!Number.isInteger(id) || id <= 0) {
-            return res.status(400).json({
-                ok: false,
-                message: 'El ID de la imagen no es válido'
-            });
-        }
-
         const imagen = await Galeria.findByPk(id, {
-            attributes: [
-                'id',
-                'titulo',
-                'descripcion',
-                'imagenUrl',
-                'textoAlternativo',
-                'categoria',
-                'seccion',
-                'orden',
-                'activo',
-                'creadoEn',
-                'actualizadoEn'
-            ]
+            attributes
         });
 
         if (!imagen) {
             return res.status(404).json({
                 ok: false,
-                message: 'Imagen de galería no encontrada'
+                message: 'Imagen no encontrada'
             });
         }
 
@@ -130,7 +199,111 @@ async function obtenerImagenGaleria(req, res, next) {
     }
 }
 
+async function crearImagenGaleria(req, res, next) {
+    try {
+        const validationError =
+            validateBody(req.body);
+
+        if (validationError) {
+            return res.status(400).json({
+                ok: false,
+                message: validationError
+            });
+        }
+
+        const imagen = await Galeria.create(
+            buildPayload(req.body)
+        );
+
+        res.status(201).json({
+            ok: true,
+            message: 'Imagen creada correctamente',
+            data: imagen
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function actualizarImagenGaleria(
+    req,
+    res,
+    next
+) {
+    try {
+        const id = Number(req.params.id);
+
+        const imagen = await Galeria.findByPk(id);
+
+        if (!imagen) {
+            return res.status(404).json({
+                ok: false,
+                message: 'Imagen no encontrada'
+            });
+        }
+
+        const validationError =
+            validateBody(req.body);
+
+        if (validationError) {
+            return res.status(400).json({
+                ok: false,
+                message: validationError
+            });
+        }
+
+        await imagen.update(
+            buildPayload(req.body)
+        );
+
+        res.status(200).json({
+            ok: true,
+            message: 'Imagen actualizada',
+            data: imagen
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function cambiarEstadoImagen(req, res, next) {
+    try {
+        const id = Number(req.params.id);
+
+        const imagen = await Galeria.findByPk(id);
+
+        if (!imagen) {
+            return res.status(404).json({
+                ok: false,
+                message: 'Imagen no encontrada'
+            });
+        }
+
+        imagen.activo = normalizeBoolean(
+            req.body.activo,
+            imagen.activo
+        );
+
+        imagen.actualizadoEn = new Date();
+
+        await imagen.save();
+
+        res.status(200).json({
+            ok: true,
+            message: imagen.activo
+                ? 'Imagen activada'
+                : 'Imagen ocultada',
+            data: imagen
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     listarGaleria,
-    obtenerImagenGaleria
+    obtenerImagenGaleria,
+    crearImagenGaleria,
+    actualizarImagenGaleria,
+    cambiarEstadoImagen
 };

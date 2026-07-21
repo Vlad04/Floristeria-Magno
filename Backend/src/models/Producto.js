@@ -20,6 +20,16 @@ const Producto = sequelize.define(
             allowNull: true
         },
 
+        categoria: {
+            type: DataTypes.STRING(100),
+            allowNull: true
+        },
+
+        etiqueta: {
+            type: DataTypes.STRING(100),
+            allowNull: true
+        },
+
         precio: {
             type: DataTypes.DECIMAL(10, 2),
             allowNull: false,
@@ -30,7 +40,7 @@ const Producto = sequelize.define(
 
         stock: {
             type: DataTypes.INTEGER,
-            allowNull: true,
+            allowNull: false,
             defaultValue: 0,
             validate: {
                 min: 0
@@ -38,14 +48,29 @@ const Producto = sequelize.define(
         },
 
         imagenUrl: {
-            type: DataTypes.STRING(255),
+            type: DataTypes.STRING(500),
             allowNull: true,
             field: 'imagen_url'
         },
 
+        destacado: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+
+        orden: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 1,
+            validate: {
+                min: 0
+            }
+        },
+
         activo: {
             type: DataTypes.BOOLEAN,
-            allowNull: true,
+            allowNull: false,
             defaultValue: true
         },
 
@@ -53,6 +78,13 @@ const Producto = sequelize.define(
             type: DataTypes.DATE,
             allowNull: true,
             field: 'creado_en',
+            defaultValue: DataTypes.NOW
+        },
+
+        actualizadoEn: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            field: 'actualizado_en',
             defaultValue: DataTypes.NOW
         }
     },
