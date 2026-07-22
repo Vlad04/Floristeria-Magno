@@ -12442,3 +12442,28 @@ body.page-index .gallery-loading-spinner {
         border-radius: 14px;
     }
 }
+
+.page-rastreo #trackingFeedback:empty {
+    display: none;
+}
+
+.page-rastreo #trackingFeedback {
+    border-radius: 16px;
+    border: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.page-rastreo .tracking-form button:disabled {
+    cursor: wait;
+    opacity: 0.75;
+}
+
+.page-rastreo .tracking-input:disabled {
+    cursor: wait;
+    opacity: 0.75;
+}
+
+.page-rastreo #trackingResult[hidden] {
+    display: none !important;
+}

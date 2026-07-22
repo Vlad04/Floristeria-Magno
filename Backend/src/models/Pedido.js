@@ -10,6 +10,13 @@ const Pedido = sequelize.define(
             autoIncrement: true
         },
 
+        codigoRastreo: {
+            type: DataTypes.STRING(30),
+            allowNull: false,
+            unique: true,
+            field: 'codigo_rastreo'
+        },
+
         clienteId: {
             type: DataTypes.INTEGER,
             allowNull: true,
@@ -24,14 +31,26 @@ const Pedido = sequelize.define(
 
         estado: {
             type: DataTypes.STRING(50),
-            allowNull: true,
+            allowNull: false,
             defaultValue: 'pendiente'
+        },
+
+        tipoPedido: {
+            type: DataTypes.STRING(100),
+            allowNull: true,
+            field: 'tipo_pedido'
         },
 
         fechaEntrega: {
             type: DataTypes.DATEONLY,
             allowNull: true,
             field: 'fecha_entrega'
+        },
+
+        ventanaEntrega: {
+            type: DataTypes.STRING(100),
+            allowNull: true,
+            field: 'ventana_entrega'
         },
 
         mensajeTarjeta: {
@@ -42,8 +61,15 @@ const Pedido = sequelize.define(
 
         creadoEn: {
             type: DataTypes.DATE,
-            allowNull: true,
+            allowNull: false,
             field: 'creado_en',
+            defaultValue: DataTypes.NOW
+        },
+
+        actualizadoEn: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            field: 'actualizado_en',
             defaultValue: DataTypes.NOW
         }
     },
