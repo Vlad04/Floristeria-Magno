@@ -28,8 +28,19 @@
             </div>
 
             <div class="mb-3">
-                <label>Contraseña</label>
-                <input id="loginPass" type="password" class="form-control" placeholder="Contraseña">
+                <label for="loginPass">
+                    Contraseña
+                </label>
+
+                <div class="input-group">
+                    <input id="loginPass" type="password" class="form-control" placeholder="Contraseña"
+                        autocomplete="current-password">
+
+                    <button type="button" class="btn btn-outline-secondary" id="toggleLoginPassword"
+                        aria-label="Mostrar contraseña" aria-pressed="false" onclick="togglePasswordVisibility()">
+                        <i class="bi bi-eye" id="toggleLoginPasswordIcon"></i>
+                    </button>
+                </div>
             </div>
 
             <button class="btn-gold w-100" onclick="loginAdmin()">Entrar al panel</button>
@@ -168,7 +179,7 @@
                         </div>
                     </div>
 
-                    <div id="galleryTable" class="admin-gallery-grid"></div>
+                    <div id="galleryTable" class="admin-gallery-sections"></div>
                 </div>
             </section>
 
@@ -514,14 +525,37 @@
                             <label>Sección de la página</label>
 
                             <select id="gallerySection" class="form-select">
-                                <option value="hero">Hero / portada</option>
-                                <option value="momentos">Momentos</option>
-                                <option value="colecciones">Colecciones</option>
-                                <option value="historias">Historias</option>
-                                <option value="novias">Ramos de novia</option>
-                                <option value="social">Inspiración floral</option>
-                                <option value="ubicacion">Ubicación</option>
-                                <option value="otros">Otros</option>
+                                <option value="hero">
+                                    Hero / carrusel principal
+                                </option>
+
+                                <option value="hero-secundaria">
+                                    Imagen pequeña del hero
+                                </option>
+
+                                <option value="momentos">
+                                    Momentos
+                                </option>
+
+                                <option value="colecciones">
+                                    Carrusel de colecciones
+                                </option>
+
+                                <option value="historias">
+                                    Carrusel de historias
+                                </option>
+
+                                <option value="novias">
+                                    Ramos de novia
+                                </option>
+
+                                <option value="inspiracion">
+                                    Inspiración floral
+                                </option>
+
+                                <option value="otros">
+                                    Otros
+                                </option>
                             </select>
                         </div>
 
@@ -589,11 +623,30 @@
 
         let selectedSectionImageBase64 = "";
 
-        document.addEventListener("DOMContentLoaded", () => {
-            productModal = new bootstrap.Modal(document.getElementById("productModal"));
-            sectionModal = new bootstrap.Modal(document.getElementById("sectionModal"));
-            galleryModal = new bootstrap.Modal(document.getElementById("galleryModal"));
-        });
+        document.addEventListener(
+            "DOMContentLoaded",
+            async () => {
+                productModal = new bootstrap.Modal(
+                    document.getElementById(
+                        "productModal"
+                    )
+                );
+
+                sectionModal = new bootstrap.Modal(
+                    document.getElementById(
+                        "sectionModal"
+                    )
+                );
+
+                galleryModal = new bootstrap.Modal(
+                    document.getElementById(
+                        "galleryModal"
+                    )
+                );
+
+                await restoreAdminSession();
+            }
+        );
 
         function getBasicAuthorization() {
             const encodedCredentials =
@@ -672,6 +725,116 @@
             return url;
         }
 
+        function togglePasswordVisibility() {
+            const passwordInput =
+                document.getElementById("loginPass");
+
+            const toggleButton =
+                document.getElementById(
+                    "toggleLoginPassword"
+                );
+
+            const icon =
+                document.getElementById(
+                    "toggleLoginPasswordIcon"
+                );
+
+            if (
+                !passwordInput ||
+                !toggleButton ||
+                !icon
+            ) {
+                return;
+            }
+
+            const isCurrentlyHidden =
+                passwordInput.type === "password";
+
+            passwordInput.type =
+                isCurrentlyHidden
+                    ? "text"
+                    : "password";
+
+            icon.className =
+                isCurrentlyHidden
+                    ? "bi bi-eye-slash"
+                    : "bi bi-eye";
+
+            toggleButton.setAttribute(
+                "aria-label",
+                isCurrentlyHidden
+                    ? "Ocultar contraseña"
+                    : "Mostrar contraseña"
+            );
+
+            toggleButton.setAttribute(
+                "aria-pressed",
+                String(isCurrentlyHidden)
+            );
+        }
+
+        function showLoginView() {
+            document
+                .getElementById("loginView")
+                .classList
+                .remove("hidden");
+
+            document
+                .getElementById("adminView")
+                .classList
+                .add("hidden");
+        }
+
+        function showAdminView() {
+            document
+                .getElementById("loginView")
+                .classList
+                .add("hidden");
+
+            document
+                .getElementById("adminView")
+                .classList
+                .remove("hidden");
+        }
+
+        async function restoreAdminSession() {
+            const savedCredentials =
+                sessionStorage.getItem(
+                    "flor_admin_basic_auth"
+                );
+
+            if (!savedCredentials) {
+                showLoginView();
+                return;
+            }
+
+            try {
+                /*
+                 * Esta ruta está protegida con Basic Auth.
+                 * Si responde correctamente, la sesión
+                 * almacenada todavía es válida.
+                 */
+                await apiFetch(
+                    "/productos/admin/todos"
+                );
+
+                showAdminView();
+
+                await loadAllData();
+            } catch (error) {
+                console.warn(
+                    "La sesión guardada ya no es válida:",
+                    error
+                );
+
+                sessionStorage.removeItem(
+                    "flor_admin_basic_auth"
+                );
+
+                showLoginView();
+            }
+        }
+
         async function loginAdmin() {
             const email = document
                 .getElementById("loginUser")
@@ -705,15 +868,7 @@
                     "/productos/admin/todos"
                 );
 
-                document
-                    .getElementById("loginView")
-                    .classList
-                    .add("hidden");
-
-                document
-                    .getElementById("adminView")
-                    .classList
-                    .remove("hidden");
+                showAdminView();
 
                 await loadAllData();
             } catch (error) {
@@ -730,13 +885,36 @@
                 "flor_admin_basic_auth"
             );
 
-            location.reload();
+            document.getElementById(
+                "loginUser"
+            ).value = "";
+
+            document.getElementById(
+                "loginPass"
+            ).value = "";
+
+            document.getElementById(
+                "loginPass"
+            ).type = "password";
+
+            const icon =
+                document.getElementById(
+                    "toggleLoginPasswordIcon"
+                );
+
+            if (icon) {
+                icon.className = "bi bi-eye";
+            }
+
+            showLoginView();
         }
+
         async function loadAllData() {
             try {
                 const [
                     productResult,
-                    galleryResult
+                    galleryResult,
+                    settingsResult
                 ] = await Promise.all([
                     apiFetch(
                         '/productos/admin/todos'
@@ -744,6 +922,10 @@
 
                     apiFetch(
                         '/galeria/admin/todas'
+                    ),
+
+                    apiFetch(
+                        '/configuracion'
                     )
                 ]);
 
@@ -800,7 +982,43 @@
                 );
 
                 sections = [];
-                settings = {};
+                settings = {
+                    businessName:
+                        settingsResult.data.nombreNegocio || '',
+
+                    whatsapp:
+                        settingsResult.data.whatsapp || '',
+
+                    phone:
+                        settingsResult.data.telefono || '',
+
+                    address:
+                        settingsResult.data.direccion || '',
+
+                    hours:
+                        settingsResult.data.horario || '',
+
+                    heroTitle:
+                        settingsResult.data.heroTitulo || '',
+
+                    heroSubtitle:
+                        settingsResult.data.heroSubtitulo || '',
+
+                    heroButton:
+                        settingsResult.data.heroBotonTexto || '',
+
+                    instagram:
+                        settingsResult.data.instagramUrl || '',
+
+                    facebook:
+                        settingsResult.data.facebookUrl || '',
+
+                    tiktok:
+                        settingsResult.data.tiktokUrl || '',
+
+                    googleMaps:
+                        settingsResult.data.googleMapsUrl || ''
+                };
 
                 renderAll();
             } catch (error) {
@@ -1174,18 +1392,253 @@
             }).join("");
         }
 
+        function getGallerySectionInfo(section) {
+            const sections = {
+                hero: {
+                    label: "Hero / carrusel principal",
+                    description:
+                        "Imágenes grandes que aparecen en el carrusel de portada.",
+                    icon: "bi-images",
+                    order: 1
+                },
+
+                "hero-secundaria": {
+                    label: "Imagen pequeña del hero",
+                    description:
+                        "Imagen decorativa que acompaña al carrusel principal.",
+                    icon: "bi-image",
+                    order: 2
+                },
+
+                momentos: {
+                    label: "Momentos",
+                    description:
+                        "Tarjetas de Para enamorar, celebrar, agradecer y eventos.",
+                    icon: "bi-heart",
+                    order: 3
+                },
+
+                colecciones: {
+                    label: "Colecciones",
+                    description:
+                        "Carrusel editorial de arreglos y composiciones florales.",
+                    icon: "bi-collection",
+                    order: 4
+                },
+
+                historias: {
+                    label: "Historias",
+                    description:
+                        "Carrusel visual de la sección Historia detrás de cada flor.",
+                    icon: "bi-book",
+                    order: 5
+                },
+
+                novias: {
+                    label: "Ramos de novia",
+                    description:
+                        "Diseños florales mostrados en la sección de bodas y novias.",
+                    icon: "bi-gem",
+                    order: 6
+                },
+
+                inspiracion: {
+                    label: "Inspiración floral",
+                    description:
+                        "Galería horizontal ubicada cerca del final de la página.",
+                    icon: "bi-stars",
+                    order: 7
+                },
+
+                otros: {
+                    label: "Otras imágenes",
+                    description:
+                        "Imágenes sin una sección específica asignada.",
+                    icon: "bi-folder",
+                    order: 99
+                }
+            };
+
+            return sections[section] || {
+                label: section
+                    ? section
+                        .replaceAll("-", " ")
+                        .replace(/\b\w/g, letter =>
+                            letter.toUpperCase()
+                        )
+                    : "Sin sección",
+
+                description:
+                    "Imágenes asignadas a esta sección del sitio.",
+
+                icon: "bi-folder",
+
+                order: 98
+            };
+        }
+
+        function renderGalleryCard(item) {
+            const imageUrl =
+                convertDriveUrl(item.imageUrl) ||
+                "https://via.placeholder.com/600x450?text=Sin+imagen";
+
+            const isActive = item.active === "SI";
+
+            return `
+        <article class="admin-gallery-card">
+
+            <div class="admin-gallery-image-wrap">
+                <img
+                    class="admin-gallery-image"
+                    src="${imageUrl}"
+                    alt="${escapeHtml(
+                item.altText ||
+                item.title ||
+                "Imagen de galería"
+            )}"
+                    loading="lazy"
+                    onerror="
+                        this.onerror = null;
+                        this.src =
+                            'https://via.placeholder.com/600x450?text=Sin+imagen';
+                    "
+                >
+
+                <div
+                    class="admin-gallery-image-overlay"
+                ></div>
+
+                <span
+                    class="
+                        admin-gallery-status
+                        ${isActive
+                    ? "is-active"
+                    : "is-inactive"}
+                    "
+                >
+                    <span
+                        class="admin-status-dot"
+                    ></span>
+
+                    ${isActive
+                    ? "Visible"
+                    : "Oculta"}
+                </span>
+
+                <span
+                    class="admin-gallery-order"
+                >
+                    Orden ${Number(
+                        item.sortOrder || 0
+                    )}
+                </span>
+            </div>
+
+            <div class="admin-gallery-content">
+
+                <div class="admin-gallery-heading">
+                    <div>
+                        <span
+                            class="admin-gallery-category"
+                        >
+                            ${escapeHtml(
+                        item.category ||
+                        "Sin categoría"
+                    )}
+                        </span>
+
+                        <h3>
+                            ${escapeHtml(
+                        item.title ||
+                        "Imagen sin título"
+                    )}
+                        </h3>
+                    </div>
+                </div>
+
+                ${item.description
+                    ? `
+                            <p
+                                class="admin-gallery-description"
+                            >
+                                ${escapeHtml(
+                        item.description
+                    )}
+                            </p>
+                        `
+                    : ""
+                }
+
+                <div class="admin-gallery-actions">
+
+                    <button
+                        type="button"
+                        class="
+                            admin-gallery-btn
+                            admin-gallery-edit
+                        "
+                        onclick='editGalleryItem(
+                            "${item.id}"
+                        )'
+                    >
+                        <i
+                            class="
+                                bi
+                                bi-pencil-square
+                            "
+                        ></i>
+
+                        Editar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="
+                            admin-gallery-btn
+                            ${isActive
+                    ? "admin-gallery-hide"
+                    : "admin-gallery-show"}
+                        "
+                        onclick='toggleGalleryItem(
+                            "${item.id}"
+                        )'
+                    >
+                        <i
+                            class="
+                                bi
+                                ${isActive
+                    ? "bi-eye-slash"
+                    : "bi-eye"}
+                            "
+                        ></i>
+
+                        ${isActive
+                    ? "Ocultar"
+                    : "Mostrar"}
+                    </button>
+
+                </div>
+            </div>
+        </article>
+    `;
+        }
+
         function renderGallery() {
-            const container = document.getElementById("galleryTable");
+            const container =
+                document.getElementById("galleryTable");
 
             if (!gallery.length) {
                 container.innerHTML = `
             <div class="admin-gallery-empty">
                 <i class="bi bi-images"></i>
 
-                <h4>La galería está vacía</h4>
+                <h4>
+                    La galería está vacía
+                </h4>
 
                 <p>
-                    Agrega fotografías de arreglos, eventos o trabajos realizados.
+                    Agrega fotografías de arreglos,
+                    eventos o trabajos realizados.
                 </p>
             </div>
         `;
@@ -1193,106 +1646,167 @@
                 return;
             }
 
-            const sorted = [...gallery].sort(
-                (a, b) =>
-                    Number(a.sortOrder || 999) -
-                    Number(b.sortOrder || 999)
+            /*
+             * Agrupa las imágenes por el valor
+             * de la columna seccion.
+             */
+            const groupedGallery = gallery.reduce(
+                (groups, item) => {
+                    const section =
+                        item.section || "otros";
+
+                    if (!groups[section]) {
+                        groups[section] = [];
+                    }
+
+                    groups[section].push(item);
+
+                    return groups;
+                },
+                {}
             );
 
-            container.innerHTML = sorted.map(item => {
-                const imageUrl =
-                    convertDriveUrl(item.imageUrl) ||
-                    "https://via.placeholder.com/600x450?text=Sin+imagen";
+            /*
+             * Ordena las secciones en el mismo
+             * orden visual en que aparecen en index.html.
+             */
+            const sectionKeys = Object
+                .keys(groupedGallery)
+                .sort((sectionA, sectionB) => {
+                    const infoA =
+                        getGallerySectionInfo(sectionA);
 
-                const isActive = item.active === "SI";
+                    const infoB =
+                        getGallerySectionInfo(sectionB);
 
-                return `
-            <article class="admin-gallery-card">
+                    return infoA.order - infoB.order;
+                });
 
-                <div class="admin-gallery-image-wrap">
-                    <img
-                        class="admin-gallery-image"
-                        src="${imageUrl}"
-                        alt="${escapeHtml(item.title || "Imagen de galería")}"
-                        loading="lazy"
-                        onerror="
-                            this.onerror = null;
-                            this.src = 'https://via.placeholder.com/600x450?text=Sin+imagen';
-                        "
-                    >
+            container.innerHTML = sectionKeys
+                .map(section => {
+                    const sectionInfo =
+                        getGallerySectionInfo(section);
 
-                    <div class="admin-gallery-image-overlay"></div>
+                    const items =
+                        groupedGallery[section]
+                            .sort(
+                                (itemA, itemB) =>
+                                    Number(
+                                        itemA.sortOrder || 999
+                                    ) -
+                                    Number(
+                                        itemB.sortOrder || 999
+                                    )
+                            );
 
-                    <span
+                    const activeCount =
+                        items.filter(
+                            item => item.active === "SI"
+                        ).length;
+
+                    const hiddenCount =
+                        items.length - activeCount;
+
+                    return `
+                <section
+                    class="admin-gallery-section"
+                    data-gallery-section="${escapeHtml(
+                        section
+                    )}"
+                >
+                    <header
                         class="
-                            admin-gallery-status
-                            ${isActive
-                        ? "is-active"
-                        : "is-inactive"}
+                            admin-gallery-section-header
                         "
                     >
-                        <span class="admin-status-dot"></span>
-
-                        ${isActive ? "Visible" : "Oculta"}
-                    </span>
-
-                    <span class="admin-gallery-order">
-                        Orden ${Number(item.sortOrder || 0)}
-                    </span>
-                </div>
-
-                <div class="admin-gallery-content">
-
-                    <div class="admin-gallery-heading">
-                        <div>
-                            <span class="admin-gallery-category">
-                                ${escapeHtml(item.category || "Sin categoría")}
+                        <div
+                            class="
+                                admin-gallery-section-title
+                            "
+                        >
+                            <span
+                                class="
+                                    admin-gallery-section-icon
+                                "
+                            >
+                                <i
+                                    class="
+                                        bi
+                                        ${sectionInfo.icon}
+                                    "
+                                ></i>
                             </span>
 
-                            <h3>
-                                ${escapeHtml(item.title || "Imagen sin título")}
-                            </h3>
+                            <div>
+                                <h3>
+                                    ${escapeHtml(
+                        sectionInfo.label
+                    )}
+                                </h3>
+
+                                <p>
+                                    ${escapeHtml(
+                        sectionInfo.description
+                    )}
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="admin-gallery-actions">
-
-                        <button
-                            type="button"
-                            class="admin-gallery-btn admin-gallery-edit"
-                            onclick='editGalleryItem("${item.id}")'
-                        >
-                            <i class="bi bi-pencil-square"></i>
-                            Editar
-                        </button>
-
-                        <button
-                            type="button"
+                        <div
                             class="
-                                admin-gallery-btn
-                                ${isActive
-                        ? "admin-gallery-hide"
-                        : "admin-gallery-show"}
+                                admin-gallery-section-summary
                             "
-                            onclick='toggleGalleryItem("${item.id}")'
                         >
-                            <i
+                            <span
                                 class="
-                                    bi
-                                    ${isActive
-                        ? "bi-eye-slash"
-                        : "bi-eye"}
+                                    gallery-summary-total
                                 "
-                            ></i>
+                            >
+                                ${items.length}
+                                ${items.length === 1
+                            ? "imagen"
+                            : "imágenes"}
+                            </span>
 
-                            ${isActive ? "Ocultar" : "Mostrar"}
-                        </button>
+                            <span
+                                class="
+                                    gallery-summary-visible
+                                "
+                            >
+                                ${activeCount}
+                                visibles
+                            </span>
 
+                            ${hiddenCount > 0
+                            ? `
+                                        <span
+                                            class="
+                                                gallery-summary-hidden
+                                            "
+                                        >
+                                            ${hiddenCount}
+                                            ocultas
+                                        </span>
+                                    `
+                            : ""
+                        }
+                        </div>
+                    </header>
+
+                    <div
+                        class="
+                            admin-gallery-grid
+                            admin-gallery-section-grid
+                        "
+                    >
+                        ${items
+                            .map(renderGalleryCard)
+                            .join("")}
                     </div>
-                </div>
-            </article>
-        `;
-            }).join("");
+                </section>
+            `;
+                })
+                .join("");
         }
 
         function renderSettings() {
@@ -1782,29 +2296,83 @@
             }
         }
 
-        function saveSettings() {
-            settings = {
-                businessName: document.getElementById("settingBusinessName").value.trim(),
-                whatsapp: document.getElementById("settingWhatsapp").value.trim(),
-                address: document.getElementById("settingAddress").value.trim(),
-                hours: document.getElementById("settingHours").value.trim(),
-                heroTitle: document.getElementById("settingHeroTitle").value.trim(),
-                heroSubtitle: document.getElementById("settingHeroSubtitle").value.trim(),
-                heroButton: document.getElementById("settingHeroButton").value.trim(),
-                social: document.getElementById("settingSocial").value.trim()
-            };
+        async function saveSettings() {
+            try {
+                const payload = {
+                    nombreNegocio: document
+                        .getElementById(
+                            'settingBusinessName'
+                        )
+                        .value
+                        .trim(),
 
-            alert("Configuración guardada en modo demo.");
+                    whatsapp: document
+                        .getElementById(
+                            'settingWhatsapp'
+                        )
+                        .value
+                        .trim(),
 
-            /*
-            // CÓDIGO REAL PARA DESPUÉS
-            apiRequest({
-              action: "saveSettings",
-              token: sessionStorage.getItem("flor_admin_token"),
-              deviceId: getDeviceId(),
-              settings
-            });
-            */
+                    direccion: document
+                        .getElementById(
+                            'settingAddress'
+                        )
+                        .value
+                        .trim(),
+
+                    horario: document
+                        .getElementById(
+                            'settingHours'
+                        )
+                        .value
+                        .trim(),
+
+                    heroTitulo: document
+                        .getElementById(
+                            'settingHeroTitle'
+                        )
+                        .value
+                        .trim(),
+
+                    heroSubtitulo: document
+                        .getElementById(
+                            'settingHeroSubtitle'
+                        )
+                        .value
+                        .trim(),
+
+                    heroBotonTexto: document
+                        .getElementById(
+                            'settingHeroButton'
+                        )
+                        .value
+                        .trim(),
+
+                    instagramUrl: document
+                        .getElementById(
+                            'settingSocial'
+                        )
+                        .value
+                        .trim()
+                };
+
+                await apiFetch(
+                    '/configuracion',
+                    {
+                        method: 'PUT',
+                        body: JSON.stringify(payload)
+                    }
+                );
+
+                await loadAllData();
+
+                alert(
+                    'Configuración guardada correctamente.'
+                );
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+            }
         }
 
         function handleImageFile(event, type) {
