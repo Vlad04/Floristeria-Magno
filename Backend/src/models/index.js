@@ -5,7 +5,7 @@ const DetallePedido = require('./DetallePedido');
 const HistorialPedido = require('./HistorialPedido');
 const Galeria = require('./Galeria');
 const Configuracion = require('./Configuracion');
-
+const RastreoUbicacion = require('./RastreoUbicacion');
 /*
  * clientes 1 ─── N pedidos
  */
@@ -58,6 +58,16 @@ HistorialPedido.belongsTo(Pedido, {
     as: 'pedido'
 });
 
+Pedido.hasMany(RastreoUbicacion, {
+    foreignKey: 'pedidoId',
+    as: 'ubicaciones'
+});
+
+RastreoUbicacion.belongsTo(Pedido, {
+    foreignKey: 'pedidoId',
+    as: 'pedido'
+});
+
 module.exports = {
     Cliente,
     Producto,
@@ -65,5 +75,6 @@ module.exports = {
     DetallePedido,
     HistorialPedido,
     Galeria,
-    Configuracion
+    Configuracion,
+    RastreoUbicacion
 };

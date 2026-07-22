@@ -1,12 +1,13 @@
 const path = require('path');
+const http = require('http');
+const { Server } = require('socket.io');
 
 /*
- * Hostinger proporciona NODE_ENV y las demás variables directamente.
- *
- * En local, si NODE_ENV no está definido, usamos development
- * y cargamos Backend/.env.development.
+ * Hostinger proporciona NODE_ENV y las variables
+ * directamente en producción.
  */
-const environment = process.env.NODE_ENV || 'development';
+const environment =
+    process.env.NODE_ENV || 'development';
 
 if (environment !== 'production') {
     const result = require('dotenv').config({
@@ -26,33 +27,155 @@ if (environment !== 'production') {
     }
 }
 
+/*
+ * La zona horaria debe establecerse antes de importar
+ * la aplicación, Sequelize y los modelos.
+ */
+process.env.TZ =
+    process.env.APP_TIME_ZONE ||
+    'America/Mexico_City';
+
 const app = require('./app');
 const sequelize = require('./config/database');
 
-const PORT = Number(process.env.PORT || 3000);
+const PORT = Number(
+    process.env.PORT || 3000
+);
 
-let server;
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    process.env.FRONTEND_URL_WWW,
+    'http://localhost:5500',
+    'http://127.0.0.1:5500',
+    'https://vlad04.github.io',
+    'https://listoenlinea-labs.github.io'
+].filter(Boolean);
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin(origin, callback) {
+            /*
+             * Permite conexiones sin Origin desde
+             * herramientas internas.
+             */
+            if (!origin) {
+                return callback(null, true);
+            }
+
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+
+            return callback(
+                new Error(
+                    `Origen no permitido en Socket.IO: ${origin}`
+                )
+            );
+        },
+
+        methods: [
+            'GET',
+            'POST'
+        ],
+
+        credentials: false
+    },
+
+    /*
+     * Mantiene compatibilidad con proveedores que
+     * administran WebSocket detrás de un proxy.
+     */
+    transports: [
+        'websocket',
+        'polling'
+    ]
+});
+
+io.on('connection', (socket) => {
+    socket.on(
+        'rastreo:unirse',
+        ({ codigoRastreo } = {}) => {
+            const codigo = String(
+                codigoRastreo || ''
+            )
+                .trim()
+                .toUpperCase();
+
+            if (!/^JHM-[A-Z0-9-]+$/.test(codigo)) {
+                return;
+            }
+
+            socket.join(
+                `pedido:${codigo}`
+            );
+        }
+    );
+
+    socket.on(
+        'rastreo:salir',
+        ({ codigoRastreo } = {}) => {
+            const codigo = String(
+                codigoRastreo || ''
+            )
+                .trim()
+                .toUpperCase();
+
+            if (!codigo) {
+                return;
+            }
+
+            socket.leave(
+                `pedido:${codigo}`
+            );
+        }
+    );
+});
+
+/*
+ * Permite que los controladores recuperen Socket.IO
+ * mediante req.app.get('io').
+ */
+app.set('io', io);
 
 async function startServer() {
     try {
         await sequelize.authenticate();
 
-        console.log('✅ Conexión con MySQL establecida correctamente.');
-        console.log(`✅ Base configurada: ${process.env.DB_NAME}`);
+        console.log(
+            '✅ Conexión con MySQL establecida correctamente.'
+        );
 
-        server = app.listen(PORT, '0.0.0.0', () => {
-            console.log(`✅ API ejecutándose en el puerto ${PORT}`);
+        console.log(
+            `✅ Base configurada: ${process.env.DB_NAME}`
+        );
+
+        server.listen(PORT, () => {
             console.log(
-                `✅ Entorno: ${process.env.NODE_ENV || environment}`
+                `✅ Servidor ejecutándose en puerto ${PORT}`
             );
         });
     } catch (error) {
-        console.error('❌ No fue posible iniciar la API.');
-        console.error('Tipo:', error.name);
-        console.error('Mensaje:', error.message);
+        console.error(
+            '❌ No fue posible iniciar la API.'
+        );
+
+        console.error(
+            'Tipo:',
+            error.name
+        );
+
+        console.error(
+            'Mensaje:',
+            error.message
+        );
 
         if (error.original?.code) {
-            console.error('Código MySQL:', error.original.code);
+            console.error(
+                'Código MySQL:',
+                error.original.code
+            );
         }
 
         process.exit(1);
@@ -60,11 +183,15 @@ async function startServer() {
 }
 
 async function shutdown(signal) {
-    console.log(`\n${signal} recibido. Cerrando servidor...`);
+    console.log(
+        `\n${signal} recibido. Cerrando servidor...`
+    );
 
     try {
-        if (server) {
-            await new Promise((resolve, reject) => {
+        io.close();
+
+        await new Promise(
+            (resolve, reject) => {
                 server.close((error) => {
                     if (error) {
                         reject(error);
@@ -73,8 +200,8 @@ async function shutdown(signal) {
 
                     resolve();
                 });
-            });
-        }
+            }
+        );
 
         await sequelize.close();
 
@@ -93,23 +220,36 @@ async function shutdown(signal) {
     }
 }
 
-process.on('SIGINT', () => shutdown('SIGINT'));
-process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on(
+    'SIGINT',
+    () => shutdown('SIGINT')
+);
 
-process.on('unhandledRejection', (error) => {
-    console.error(
-        '❌ Promesa rechazada no controlada:',
-        error
-    );
-});
+process.on(
+    'SIGTERM',
+    () => shutdown('SIGTERM')
+);
 
-process.on('uncaughtException', (error) => {
-    console.error(
-        '❌ Excepción no controlada:',
-        error
-    );
+process.on(
+    'unhandledRejection',
+    (error) => {
+        console.error(
+            '❌ Promesa rechazada no controlada:',
+            error
+        );
+    }
+);
 
-    process.exit(1);
-});
+process.on(
+    'uncaughtException',
+    (error) => {
+        console.error(
+            '❌ Excepción no controlada:',
+            error
+        );
+
+        process.exit(1);
+    }
+);
 
 startServer();

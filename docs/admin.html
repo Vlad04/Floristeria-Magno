@@ -59,14 +59,21 @@
                     <p class="small-muted mb-0">Control visual de productos, secciones, galería y configuración.</p>
                 </div>
 
-                <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn-soft" onclick="loadAllData()">
-                        <i class="bi bi-arrow-clockwise"></i> Actualizar
+                <div class="admin-topbar-actions d-flex gap-2 flex-wrap">
+                    <button class="btn-soft admin-header-btn" onclick="loadAllData()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        <span>Actualizar</span>
                     </button>
-                    <button class="btn-gold" id="mainActionBtn" onclick="openProductModal()">
-                        <i class="bi bi-plus-lg"></i> Nuevo producto
+
+                    <button class="btn-gold admin-header-btn" id="mainActionBtn" onclick="openProductModal()">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Nuevo producto</span>
                     </button>
-                    <button class="btn-soft" onclick="logoutAdmin()">Salir</button>
+
+                    <button class="btn-soft admin-header-btn" onclick="logoutAdmin()">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Salir</span>
+                    </button>
                 </div>
             </div>
 
